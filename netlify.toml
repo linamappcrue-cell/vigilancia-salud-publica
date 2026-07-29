@@ -1,0 +1,26 @@
+# Configuración de Netlify
+# Vigilancia en Salud Pública v2.2
+
+[build]
+  # No necesita build (es un archivo HTML estático)
+  publish = "."
+  command = ""
+
+[context.production]
+  # Contexto de producción
+  publish = "."
+
+[[redirects]]
+  # Redirige todas las rutas a index.html (para SPA)
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Encabezados de seguridad
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
