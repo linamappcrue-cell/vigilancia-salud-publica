@@ -1,0 +1,2565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vigilancia en Salud Pública - Laboratorios Clínicos</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); } 50% { box-shadow: 0 0 0 10px rgba(22, 163, 74, 0); } }
+        @keyframes glow { 0%, 100% { text-shadow: 0 0 5px rgba(22, 163, 74, 0.5); } 50% { text-shadow: 0 0 20px rgba(22, 163, 74, 0.9); } }
+        
+        :root {
+            --primary: #16a34a;
+            --secondary: #0284c7;
+            --danger: #dc2626;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --bg: #f8fafc;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-soft: #64748b;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #001f3f 0%, #0d47a1 50%, #1a237e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.6s ease-out;
+            border: 2px solid rgba(22, 163, 74, 0.1);
+        }
+        
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo-icon { font-size: 80px; margin-bottom: 15px; animation: pulse 2s infinite; }
+        .logo h1 { background: linear-gradient(135deg, #16a34a, #0284c7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; font-size: 32px; }
+        .logo p { color: var(--text-soft); font-size: 16px; }
+        
+        .demo-box {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 100%);
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-size: 14px;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+        
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, #15803d 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 25px rgba(22, 163, 74, 0.3);
+            animation: fadeIn 1.2s ease-out;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(22, 163, 74, 0.5);
+        }
+        
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .app-container { display: none; background: var(--bg); min-height: 100vh; animation: fadeIn 0.5s ease-out; }
+        .app-container.active { display: flex; }
+        
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            padding: 30px 0;
+            overflow-y: auto;
+            box-shadow: 5px 0 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .sidebar-header {
+            font-size: 20px;
+            font-weight: 800;
+            padding: 0 20px;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .sidebar-item {
+            padding: 14px 20px;
+            margin: 0 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+            border-left-color: var(--primary);
+        }
+        
+        .sidebar-item.active {
+            background: linear-gradient(135deg, rgba(22, 163, 74, 0.3), rgba(2, 132, 199, 0.3));
+            font-weight: 700;
+            border-left-color: var(--primary);
+            box-shadow: inset 0 0 10px rgba(22, 163, 74, 0.2);
+        }
+        
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+        
+        .view { display: none; animation: fadeIn 0.5s ease-out; }
+        .view.active { display: block; }
+        
+        h2 {
+            color: var(--text);
+            margin-bottom: 25px;
+            font-size: 32px;
+            background: linear-gradient(135deg, #16a34a, #0284c7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid rgba(22, 163, 74, 0.1);
+            cursor: pointer;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary);
+        }
+        
+        .stat-number {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary);
+            animation: glow 2s ease-in-out infinite;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-soft);
+            margin-top: 15px;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            border: 2px solid rgba(22, 163, 74, 0.05);
+            transition: all 0.3s;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+            border-color: var(--primary);
+        }
+        
+        h3 {
+            color: var(--text);
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 100%);
+            font-weight: 700;
+            color: var(--text);
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        
+        tr:hover {
+            background: rgba(22, 163, 74, 0.05);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+        
+        .badge:hover {
+            transform: scale(1.05);
+        }
+        
+        .badge-green {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            color: #166534;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .badge-red {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #991b1b;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+        
+        .badge-blue {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            color: #1e40af;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+        }
+        
+        .alert {
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+            animation: slideIn 0.4s ease-out;
+        }
+        
+        .alert-error {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #991b1b;
+            border-left-color: #dc2626;
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            color: #166534;
+            border-left-color: #16a34a;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #10b981);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(22, 163, 74, 0.5);
+        }
+        
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2316a34a' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 20px;
+            padding-right: 40px;
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN -->
+    <div class="login-container" id="loginContainer">
+        <div class="logo">
+            <div class="logo-icon">🏥</div>
+            <h1>Vigilancia en Salud Pública</h1>
+            <p>Sistema de registros de muestras y referencia<br>diagnóstica para laboratorios clínicos.</p>
+        </div>
+
+        <div class="demo-box">
+            <strong>Demo:</strong><br>
+            Usuario: LAB001<br>
+            Contraseña: Lab@2024
+        </div>
+
+        <div class="form-group">
+            <label>USUARIO DEL LABORATORIO</label>
+            <input type="text" id="username" value="LAB001" placeholder="Código del laboratorio">
+        </div>
+
+        <div class="form-group">
+            <label>CONTRASEÑA</label>
+            <input type="password" id="password" value="Lab@2024" placeholder="Contraseña">
+        </div>
+
+        <button class="btn" onclick="handleLogin()">Ingresar</button>
+    </div>
+
+    <!-- APP -->
+    <div class="app-container" id="appContainer">
+        <!-- SIDEBAR -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">🏥 Vigilancia LSP</div>
+            <div class="sidebar-item active" onclick="showView('dashboard'); setActive(this)">📊 Dashboard</div>
+            <div class="sidebar-item" onclick="showView('asesoria'); setActive(this)">🤖 Asesoramiento IA</div>
+            <div class="sidebar-item" onclick="showView('busqueda'); setActive(this)">📊 Comportamiento Epidemiológico</div>
+            <div class="sidebar-item" onclick="showView('definiciones'); setActive(this)">📋 Definiciones</div>
+            <div class="sidebar-item" onclick="showView('algoritmos'); setActive(this)">🔄 Algoritmos</div>
+            <div class="sidebar-item" onclick="showView('muestras'); setActive(this)">🧪 Muestras</div>
+            <div class="sidebar-item" onclick="showView('registrar'); setActive(this)">📝 Registrar</div>
+            <div class="sidebar-item" onclick="showView('referencia'); setActive(this)">↔️ Referencia</div>
+            <div class="sidebar-item" onclick="showView('contrarreferencia'); setActive(this)">📨 Contrarreferencia</div>
+            <div class="sidebar-item" onclick="showView('descargaexcel'); setActive(this)">📥 Descargar Excel EISP</div>
+            <div class="sidebar-item" onclick="handleLogout()" style="margin-top: 40px; background: rgba(220, 38, 38, 0.2);">🚪 Cerrar Sesión</div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <!-- DASHBOARD -->
+            <div class="view active" id="dashboard">
+                <h2>📊 Dashboard de Vigilancia</h2>
+                <p style="color: var(--text-soft); margin-bottom: 20px;">Estadísticas de muestras referidas al Laboratorio de Salud Pública</p>
+
+                <div class="card">
+                    <h3>🔍 Filtrar por Evento</h3>
+                    <select id="dash_filtro_evento" onchange="updateDashboardFiltrado()" style="max-width: 300px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px;">
+                        <option value="">TODOS LOS EVENTOS</option>
+                        <option value="dengue">Dengue</option>
+                        <option value="covid">COVID-19</option>
+                        <option value="tuberculosis">Tuberculosis</option>
+                        <option value="sarampion">Sarampión</option>
+                        <option value="malaria">Malaria</option>
+                        <option value="influenza">Influenza</option>
+                    </select>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="statTotal">0</div>
+                        <div class="stat-label">Total de Muestras</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="statReferidas" style="color: #0284c7;">0</div>
+                        <div class="stat-label">Referidas a LSP</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="statConResultado" style="color: #16a34a;">0</div>
+                        <div class="stat-label">Con Resultado del LSP</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="statPendientes" style="color: #f59e0b;">0</div>
+                        <div class="stat-label">Pendientes Resultado</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Distribución de Muestras por Evento</h3>
+                    <div id="eventChart" style="display: flex; gap: 15px; margin-top: 20px; height: 200px; align-items: flex-end;">
+                        <!-- Gráfico -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Últimas Muestras Referidas</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>ID Muestra</th>
+                                <th>Paciente</th>
+                                <th>Evento</th>
+                                <th>Resultado Local</th>
+                                <th>Resultado LSP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboardTable">
+                            <!-- Datos -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ASESORAMIENTO IA -->
+            <div class="view" id="asesoria">
+                <h2>🤖 Asesoramiento IA - Protocolos INS</h2>
+
+                <div class="card">
+                    <h3>📝 Descripción del Caso</h3>
+
+                    <div class="form-group">
+                        <label>Síntomas Principales:</label>
+                        <textarea id="casoSintomas" placeholder="Ej: Fiebre, tos, espectoración..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Datos Epidemiológicos:</label>
+                        <textarea id="casoDatos" placeholder="Ej: 45 años, mujer, sin antecedentes..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Hallazgos Clínicos (si aplica):</label>
+                        <textarea id="casoHallazgos" placeholder="Ej: Sin exámenes disponibles..."></textarea>
+                    </div>
+
+                    <button class="btn-primary" onclick="analizarCasoConIA()">🔍 Analizar Caso con IA</button>
+                </div>
+
+                <div class="card" id="resultadosAsesoria" style="display: none;">
+                    <h3>Análisis Profesional</h3>
+                    <div id="perspectivaMedica"></div>
+                </div>
+
+                <div class="card">
+                    <h3>📖 Historial de Análisis</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Síntomas</th>
+                                <th>Evento Propuesto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaAnalisis">
+                            <tr><td colspan="3" style="text-align: center; color: var(--text-soft);">Sin análisis aún</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CONTRARREFERENCIA -->
+            <div class="view" id="contrarreferencia">
+                <h2>📨 Contrarreferencia - Resultados del LSP</h2>
+
+                <div class="card" style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <strong>🔍 Filtrar por Evento:</strong><br><br>
+                    <select id="contra_filtro_evento" onchange="filtrarMuestrasContrarreferencia()" style="max-width: 300px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px;">
+                        <option value="">TODOS LOS EVENTOS</option>
+                        <option value="dengue">Dengue</option>
+                        <option value="covid">COVID-19</option>
+                        <option value="tuberculosis">Tuberculosis</option>
+                        <option value="sarampion">Sarampión</option>
+                        <option value="malaria">Malaria</option>
+                        <option value="influenza">Influenza</option>
+                    </select>
+                </div>
+
+                <div class="card">
+                    <h3>Muestras Referidas Pendientes</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>ID Muestra</th>
+                                <th>Paciente</th>
+                                <th>Evento</th>
+                                <th>Estado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="muestrasReferidas">
+                            <!-- Datos -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h3>Ingresar Resultado del LSP</h3>
+
+                    <div class="form-group">
+                        <label>ID de Muestra a Actualizar:</label>
+                        <select id="muestra_id" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;">
+                            <option value="">Selecciona una muestra referida...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Resultado Final del LSP:</label>
+                        <select id="resultado_lsp" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;">
+                            <option value="">Selecciona resultado...</option>
+                            <option value="positivo">✅ Positivo - Confirmado</option>
+                            <option value="negativo">❌ Negativo - Descartado</option>
+                            <option value="indeterminado">❓ Indeterminado</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Prueba Realizada en LSP:</label>
+                        <input type="text" id="prueba_lsp" placeholder="Ej: PCR, Cultivo, Serología...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Observaciones/Tipificación:</label>
+                        <textarea id="observaciones_lsp" placeholder="Detalles adicionales..."></textarea>
+                    </div>
+
+                    <button class="btn-primary" onclick="ingresarResultadoLSP()">📤 Registrar Resultado del LSP</button>
+                </div>
+
+                <div class="card">
+                    <h3>✅ Historial de Resultados Recibidos</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>ID Muestra</th>
+                                <th>Paciente</th>
+                                <th>Evento</th>
+                                <th>Resultado LSP</th>
+                                <th>Prueba</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historialResultados">
+                            <tr><td colspan="6" style="text-align: center; color: var(--text-soft);">Sin resultados aún</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- MÓDULO DESCARGAR EXCEL EISP -->
+            <div class="view" id="descargaexcel">
+                <h2>📥 Descargar Archivo Excel - Referencia y Contrarreferencia EISP</h2>
+
+                <div class="card" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b;">
+                    <h3>📋 Archivo de Referencia-Contrarreferencia</h3>
+                    <p style="color: #92400e; margin-bottom: 15px; font-size: 14px;">
+                        Descarga un archivo Excel (CSV) con todas las muestras referidas al Laboratorio de Salud Pública, 
+                        incluyendo estado de referencia, resultado del LSP y contrarreferencia.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>📊 Resumen de Muestras Referidas</h3>
+                    <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                        <div style="background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 20px; border-radius: 10px; border-left: 4px solid #0284c7;">
+                            <div style="font-size: 28px; font-weight: 800; color: #0284c7;" id="stat_total_ref">0</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 8px; text-transform: uppercase; font-weight: 600;">Total Referidas</div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #f0fdf4, #dbeafe); padding: 20px; border-radius: 10px; border-left: 4px solid #16a34a;">
+                            <div style="font-size: 28px; font-weight: 800; color: #16a34a;" id="stat_completadas">0</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 8px; text-transform: uppercase; font-weight: 600;">Con Resultado LSP</div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 20px; border-radius: 10px; border-left: 4px solid #f59e0b;">
+                            <div style="font-size: 28px; font-weight: 800; color: #f59e0b;" id="stat_pendientes_desc">0</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 8px; text-transform: uppercase; font-weight: 600;">Pendientes de Resultado</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 25px;">
+                        <button onclick="descargarExcelCompleto()" style="padding: 15px 30px; background: linear-gradient(135deg, #16a34a, #10b981); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px; flex: 1; min-width: 200px;">
+                            📥 Descargar Excel Todas las Muestras
+                        </button>
+                        <button onclick="descargarExcelReferencia()" style="padding: 15px 30px; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px; flex: 1; min-width: 200px;">
+                            📥 Descargar Referidas Solamente
+                        </button>
+                    </div>
+
+                    <div style="background: #f9fafb; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 12px;">📄 Contenido del archivo:</h4>
+                        <ul style="margin-left: 20px; color: #64748b; line-height: 1.8;">
+                            <li><strong>ID Muestra:</strong> Código único asignado automáticamente (MU-YYYY-NNN)</li>
+                            <li><strong>Fecha Registro:</strong> Cuándo se registró la muestra en el sistema</li>
+                            <li><strong>Paciente:</strong> Nombre y datos del paciente</li>
+                            <li><strong>Evento:</strong> Tipo de evento de interés en salud pública</li>
+                            <li><strong>Resultado Local:</strong> Resultado de la prueba en laboratorio clínico</li>
+                            <li><strong>Fecha Referencia:</strong> Cuándo se envió al LSP</li>
+                            <li><strong>Estado Referencia:</strong> Preparada, Enviada, Recibida, En Proceso, Completada</li>
+                            <li><strong>Laboratorio Destino:</strong> LSP o laboratorio de referencia</li>
+                            <li><strong>Resultado LSP:</strong> Resultado de confirmación del LSP</li>
+                            <li><strong>Fecha Contrarreferencia:</strong> Cuándo retornó el resultado</li>
+                            <li><strong>Estado Final:</strong> Confirmado, Descartado, Incompleto, etc.</li>
+                            <li><strong>Observaciones:</strong> Datos adicionales o tipificación</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: #eff6ff; padding: 20px; border-radius: 10px; border-left: 4px solid #0284c7;">
+                        <h4 style="margin-bottom: 12px; color: #0c4a6e;">💡 Cómo usar el archivo:</h4>
+                        <ol style="margin-left: 20px; color: #0c4a6e; line-height: 1.8;">
+                            <li>Descarga el archivo en formato CSV</li>
+                            <li>Abre en Excel, Google Sheets u otra hoja de cálculo</li>
+                            <li>Filtra por evento, estado o fecha según necesites</li>
+                            <li>Usa para reportes, seguimiento o auditoría</li>
+                            <li>Cada descarga contiene datos actualizados hasta el momento</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 Tabla de Muestras Referidas (Vista Previa)</h3>
+                    <table id="tabla_preview_excel" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <thead>
+                            <tr style="background: linear-gradient(135deg, #16a34a, #10b981);">
+                                <th style="padding: 12px; text-align: left; color: white; font-weight: 700;">ID Muestra</th>
+                                <th style="padding: 12px; text-align: left; color: white; font-weight: 700;">Evento</th>
+                                <th style="padding: 12px; text-align: left; color: white; font-weight: 700;">Resultado Local</th>
+                                <th style="padding: 12px; text-align: left; color: white; font-weight: 700;">Resultado LSP</th>
+                                <th style="padding: 12px; text-align: left; color: white; font-weight: 700;">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody_preview_excel">
+                            <tr><td colspan="5" style="text-align: center; padding: 15px; color: #64748b;">Cargando datos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- BÚSQUEDA AVANZADA -->
+            <div class="view" id="busqueda">
+                <h2>📊 Comportamiento Epidemiológico de Eventos en Salud Pública</h2>
+
+                <div class="card" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 4px solid #0284c7;">
+                    <h3>📋 Comportamiento Epidemiológico en Bogotá</h3>
+                    <p style="color: #0c4a6e; line-height: 1.8; margin-bottom: 15px;">
+                        <strong>Según Protocolos INS y datos de vigilancia en salud pública:</strong>
+                    </p>
+                    
+                    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <p><strong>🦟 Dengue (Código 210):</strong> Enfermedad vector-dependiente con brotes estacionales (época lluviosa). 
+                        En Bogotá se registran casos principalmente en localidades con altitud <2600m. Transmisión por Aedes aegypti. 
+                        Incidencia variable: 15-40 casos semanales según época. Protocolo INS requiere notificación dentro de 24h de confirmación. 
+                        Tipos circulantes: DEN-1, DEN-2, DEN-3, DEN-4. Complicaciones: fiebre hemorrágica, síndrome de choque.</p>
+                    </div>
+
+                    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <p><strong>🦠 COVID-19 (Código 715):</strong> Infección respiratoria por SARS-CoV-2. En Bogotá persiste circulación comunitaria 
+                        con nuevas variantes. Casos: 5-20 semanales de notificación. Mayor incidencia en eventos de aglomeración. 
+                        Protocolo: confirmación por PCR-RT, notificación inmediata en EISP. Variantes monitoreadas: Ómicron y sublineajes. 
+                        Población vulnerable: mayores de 60 años, inmunocomprometidos, comorbilidades.</p>
+                    </div>
+
+                    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <p><strong>🔬 Tuberculosis (Código 220):</strong> Enfermedad transmisible por aire. Bogotá registra incidencia de 15-25 casos nuevos/100mil hab/año. 
+                        TB activa pulmonar es forma contagiosa principal. Protocolo: cultivo en medio de Löwenstein-Jensen, prueba de sensibilidad a fármacos. 
+                        Tratamiento supervisado obligatorio (DOTS). Complicaciones: TB-MDR, TB-XDR. Seguimiento: mínimo 2 años post-tratamiento.</p>
+                    </div>
+
+                    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <p><strong>📊 Sarampión (Código 730):</strong> Enfermedad viral prevenible por vacuna (SRP). Bogotá mantiene cobertura vacunal >95%. 
+                        Casos ocasionales por importación o fallas de inmunidad. Transmisión: respiratoria. Protocolo: serología IgM, RT-PCR en primeros 3 días. 
+                        Notificación inmediata obligatoria. Aislamiento: 5 días antes hasta 4 días después de rash. Alto potencial epidémico.</p>
+                    </div>
+
+                    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <p><strong>🦟 Malaria (Código 330):</strong> Enfermedad parasitaria vector-dependiente. En Bogotá casos importados de zonas endémicas (Chocó, Amazonía). 
+                        Transmisión local: rara (altitud >2600m). Protocolo: gota gruesa, frotis fino, PCR. Plasmodium falciparum predominante. 
+                        Notificación: dentro de 24h de confirmación. Tratamiento según especie y gravedad. Seguimiento parasitológico post-tratamiento.</p>
+                    </div>
+
+                    <p style="color: #64748b; font-size: 12px; margin-top: 15px;">
+                        📚 <strong>Fuentes:</strong> Protocolos INS, Decreto 3518/2006, Resolución 1646/2013 MSPS, Análisis de datos SaludDATA Bogotá 2024
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>🔍 Búsqueda y Filtros de Muestras</h3>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label>Filtrar por Evento</label>
+                            <select id="busq_evento" onchange="filtrarMuestras()">
+                                <option value="">TODOS LOS EVENTOS</option>
+                                <option value="dengue">Dengue</option>
+                                <option value="covid">COVID-19</option>
+                                <option value="tuberculosis">Tuberculosis</option>
+                                <option value="sarampion">Sarampión</option>
+                                <option value="malaria">Malaria</option>
+                                <option value="influenza">Influenza</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Filtrar por Resultado Local</label>
+                            <select id="busq_resultado" onchange="filtrarMuestras()">
+                                <option value="">TODOS LOS RESULTADOS</option>
+                                <option value="positivo">Positivo</option>
+                                <option value="negativo">Negativo</option>
+                                <option value="pendiente">Pendiente</option>
+                                <option value="indeterminado">Indeterminado</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Requiere Referencia</label>
+                            <select id="busq_referencia" onchange="filtrarMuestras()">
+                                <option value="">TODAS</option>
+                                <option value="si">Sí - Referidas</option>
+                                <option value="no">No - Locales</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Búsqueda por Paciente</label>
+                            <input type="text" id="busq_paciente" placeholder="Nombre o documento..." onkeyup="filtrarMuestras()">
+                        </div>
+                    </div>
+
+                    <div style="background: #f0f9ff; padding: 10px; border-radius: 6px; margin-bottom: 15px;">
+                        <strong id="busq_resultado_count">0</strong> muestras encontradas
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Resultados de Búsqueda</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>ID Muestra</th>
+                                <th>Paciente</th>
+                                <th>Evento</th>
+                                <th>Resultado Local</th>
+                                <th>Referencia</th>
+                                <th>Resultado LSP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="busq_tabla">
+                            <tr><td colspan="7" style="text-align: center; color: #64748b;">Ingresa filtros para ver resultados</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h3>📊 Estadísticas de Búsqueda</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="busq_totalEncontrados">0</div>
+                            <div class="stat-label">Total Encontrados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="busq_positivos" style="color: #dc2626;">0</div>
+                            <div class="stat-label">Positivos</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="busq_negativos" style="color: #16a34a;">0</div>
+                            <div class="stat-label">Negativos</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="busq_pendientes" style="color: #f59e0b;">0</div>
+                            <div class="stat-label">Pendientes</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DEFINICIONES DE CASO -->
+            <div class="view" id="definiciones">
+                <h2>📋 Definiciones de Caso - Protocolos INS</h2>
+
+                <div class="card" style="background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 100%); padding: 20px; border-radius: 15px; margin-bottom: 25px;">
+                    <strong style="font-size: 16px; color: var(--text);">🔍 Filtrar por Evento de Interés en Salud Pública:</strong><br><br>
+                    <select id="def_filtro_evento" onchange="filtrarDefiniciones()" style="max-width: 400px; padding: 12px; border: 2px solid var(--primary); border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                        <option value="">✓ VER TODOS LOS EVENTOS</option>
+                        <option value="dengue">🦟 Dengue (Código 210)</option>
+                        <option value="covid">🦠 COVID-19 (Código 715)</option>
+                        <option value="tuberculosis">🔬 Tuberculosis (Código 220)</option>
+                        <option value="sarampion">📊 Sarampión (Código 240)</option>
+                        <option value="malaria">🦟 Malaria (Código 230)</option>
+                    </select>
+                </div>
+
+                <div id="def_contenido">
+                <div class="card" data-evento="dengue">
+                    <h3>DENGUE (Código 210) - Protocolo INS</h3>
+                    <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                        <strong>CASO SOSPECHOSO:</strong> Persona con fiebre aguda (38°C+) por 2-7 días + 2 síntomas: cefalea intensa, dolor retrorbitario, mialgias, artralgias, rash, o manifestaciones hemorrágicas.
+                        <br><br>
+                        <strong>CASO PROBABLE:</strong> Caso sospechoso + resultado positivo en NS1 Ag o PCR-RT.
+                        <br><br>
+                        <strong>CASO CONFIRMADO:</strong> Confirmación laboratorial (NS1 Ag, PCR-RT, IgM o IgG con seroconversión).
+                    </div>
+                </div>
+
+                <div class="card" data-evento="covid">
+                    <h3>COVID-19 (Código 715) - Protocolo INS</h3>
+                    <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                        <strong>CASO SOSPECHOSO:</strong> 2+ síntomas: fiebre, tos, disnea, pérdida olfato/gusto, cefalea.
+                        <br><br>
+                        <strong>CASO PROBABLE:</strong> Caso sospechoso + antígeno positivo O contacto epidemiológico comprobado.
+                        <br><br>
+                        <strong>CASO CONFIRMADO:</strong> PCR-RT positivo (estándar oro) o antígeno SARS-CoV-2 positivo.
+                    </div>
+                </div>
+
+                <div class="card" data-evento="tuberculosis">
+                    <h3>TUBERCULOSIS (Código 220) - Protocolo INS</h3>
+                    <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                        <strong>CASO SOSPECHOSO:</strong> TOS ≥2 SEMANAS (síntoma clave) + espectoración, hemoptisis, fiebre, sudoración nocturna.
+                        <br><br>
+                        <strong>CASO PROBABLE:</strong> Baciloscopía positiva O Radiografía compatible con TB.
+                        <br><br>
+                        <strong>CASO CONFIRMADO:</strong> Baciloscopía positiva, cultivo positivo, o GeneXpert MTB/RIF positivo.
+                    </div>
+                </div>
+
+                <div class="card" data-evento="sarampion">
+                    <h3>SARAMPIÓN (Código 240) - Protocolo INS</h3>
+                    <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                        <strong>CASO SOSPECHOSO:</strong> Fiebre ≥38°C × 3 días + tos, coriza O conjuntivitis.
+                        <br><br>
+                        <strong>CASO PROBABLE:</strong> Caso sospechoso + rash maculopapular con patrón descendente + contacto epidemiológico.
+                        <br><br>
+                        <strong>CASO CONFIRMADO:</strong> Serología IgM positiva, PCR positivo, o seroconversión IgG.
+                    </div>
+                </div>
+
+                <div class="card" data-evento="malaria">
+                    <h3>MALARIA (Código 230) - Protocolo INS</h3>
+                    <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                        <strong>CASO SOSPECHOSO:</strong> Fiebre + escalofríos/sudor + antecedente zona malariógena (últimos 30 días).
+                        <br><br>
+                        <strong>CASO PROBABLE:</strong> Gota gruesa positiva identificando parásitos.
+                        <br><br>
+                        <strong>CASO CONFIRMADO:</strong> Gota gruesa positiva con especie identificada, frotis positivo, o PCR positivo.
+                    </div>
+                </div>
+
+                    <p style="color: #64748b; font-size: 12px; margin-top: 20px;">📖 Basado en Protocolos INS Colombia y Guías de Práctica Clínica MSPS</p>
+                </div>
+            </div>
+            </div>
+
+            <div class="view" id="algoritmos">
+                <h2>🔄 Algoritmos Diagnósticos</h2>
+
+                <div class="card" style="background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 100%); padding: 20px; border-radius: 15px; margin-bottom: 25px;">
+                    <strong style="font-size: 16px; color: var(--text);">🔍 Filtrar por Evento de Interés en Salud Pública:</strong><br><br>
+                    <select id="algo_filtro_evento" onchange="filtrarAlgoritmos()" style="max-width: 400px; padding: 12px; border: 2px solid var(--primary); border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                        <option value="">✓ VER TODOS LOS ALGORITMOS</option>
+                        <option value="dengue">🦟 Dengue (Código 210)</option>
+                        <option value="covid">🦠 COVID-19 (Código 715)</option>
+                        <option value="tuberculosis">🔬 Tuberculosis (Código 220)</option>
+                        <option value="sarampion">📊 Sarampión (Código 240)</option>
+                        <option value="malaria">🦟 Malaria (Código 230)</option>
+                    </select>
+                </div>
+
+                <div id="algo_contenido">
+                <div class="card" data-evento="dengue">
+                    <h3>ALGORITMO DENGUE</h3>
+                    <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <strong>PASO 1:</strong> ¿Fiebre (≥38°C) + cefalea + dolor? → SÍ continúa<br>
+                        <strong>PASO 2:</strong> ¿Dolor retrorbitario/mialgias/artralgias/rash? → SÍ continúa<br>
+                        <strong>PASO 3:</strong> ¿Cuántos días: <5d (NS1+PCR) | 5-10d (IgM+IgG) | >10d (IgG)<br>
+                        <strong>PASO 4:</strong> Investigación epidemiológica (viajes, contactos, Aedes)<br>
+                        <strong>PASO 5:</strong> Notificación OBLIGATORIA al COVE dentro 24 horas
+                    </div>
+
+                </div>
+
+                <div class="card" data-evento="covid">
+                    <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <strong>PASO 1:</strong> ¿Síntomas respiratorios? Fiebre, tos, disnea → SÍ continúa<br>
+                        <strong>PASO 2:</strong> ¿Contacto epidemiológico? Exposición últimas 2 semanas → SÍ continúa<br>
+                        <strong>PASO 3:</strong> PCR-RT INMEDIATO (estándar oro) O antígeno rápido<br>
+                        <strong>PASO 4:</strong> AISLAMIENTO inmediato + Notificación <24h<br>
+                        <strong>PASO 5:</strong> Rastreo de contactos + Investigación epidemiológica
+                    </div>
+
+                    <h3>ALGORITMO TUBERCULOSIS</h3>
+                    <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <strong>PASO 1:</strong> ¿TOS ≥2 SEMANAS? (síntoma clave) → SÍ continúa<br>
+                        <strong>PASO 2:</strong> ¿Espectoración/hemoptisis/fiebre/sudor? → SÍ continúa<br>
+                        <strong>PASO 3:</strong> Baciloscopía URGENTE (3 muestras) + GeneXpert + Rx Tórax<br>
+                        <strong>PASO 4:</strong> INICIAR TRATAMIENTO SIN ESPERAR CONFIRMACIÓN<br>
+                        <strong>PASO 5:</strong> Investigar contactos + Prueba tuberculínica + Derivar a Programa TB
+                    </div>
+
+                    <h3>ALGORITMO SARAMPIÓN</h3>
+                    <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <strong>PASO 1:</strong> ¿Fiebre ≥38°C × 3 días + síntomas catarrales? → SÍ continúa<br>
+                        <strong>PASO 2:</strong> ¿Rash maculopapular de patrón descendente? → SÍ continúa<br>
+                        <strong>PASO 3:</strong> Contacto epidemiológico establecido → CASO PROBABLE<br>
+                        <strong>PASO 4:</strong> NOTIFICACIÓN URGENTE (<24h) + BÚSQUEDA CONTACTOS INMEDIATA<br>
+                        <strong>PASO 5:</strong> Aislamiento respiratorio + Vacunación contactos en 72h
+                    </div>
+
+                    <h3>ALGORITMO MALARIA</h3>
+                    <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <strong>PASO 1:</strong> ¿Fiebre + escalofríos/sudor? + ¿Zona endémica últimos 30d? → SÍ<br>
+                        <strong>PASO 2:</strong> Gota gruesa URGENTE (<2 horas) + Frotis delgado<br>
+                        <strong>PASO 3:</strong> ¿Gota gruesa positiva? → CASO CONFIRMADO<br>
+                        <strong>PASO 4:</strong> Identificar especie (vivax, falciparum, ovale, malariae)<br>
+                        <strong>PASO 5:</strong> Tratamiento según especie + Notificación + Seguimiento parasitológico
+                    </div>
+
+                    <p style="color: #64748b; font-size: 12px; margin-top: 20px;">📖 Basado en Algoritmos diagnósticos INS Colombia</p>
+                </div>
+                </div>
+            </div>
+
+            <div class="view" id="muestras">
+                <h2>🧪 Tipos de Muestras por Evento de Interés en Salud Pública</h2>
+
+                <div class="card" style="background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 100%); padding: 20px; border-radius: 15px; margin-bottom: 25px;">
+                    <strong style="font-size: 16px; color: var(--text);">🔍 Selecciona un Evento para ver las MUESTRAS REQUERIDAS:</strong><br><br>
+                    <select id="mue_filtro_evento" onchange="actualizarMuestrasEvento()" style="width: 100%; max-width: 400px; padding: 12px; border: 2px solid var(--primary); border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                        <option value="">✓ TODAS LAS MUESTRAS</option>
+                        <option value="dengue">🦟 Dengue</option>
+                        <option value="covid">🦠 COVID-19</option>
+                        <option value="tuberculosis">🔬 Tuberculosis</option>
+                        <option value="sarampion">📊 Sarampión</option>
+                        <option value="malaria">🦟 Malaria</option>
+                        <option value="influenza">🦠 Influenza</option>
+                    </select>
+                </div>
+
+                <div id="mue_contenido">
+                    <div class="card">
+                        <h3>MUESTRAS REQUERIDAS POR EVENTO</h3>
+                        <p style="color: #64748b; margin-bottom: 15px; font-size: 14px;">
+                            <strong>⚠️ Nota:</strong> Un mismo caso puede requerir MÚLTIPLES tipos de muestras simultáneamente (ej: Sarampión requiere Suero + Orina + Hisopado)
+                        </p>
+                        <table id="tabla_muestras_evento" style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: linear-gradient(135deg, #16a34a, #10b981);">
+                                    <th style="padding: 12px; text-align: left; color: white; font-weight: 700;">Evento</th>
+                                    <th style="padding: 12px; text-align: left; color: white; font-weight: 700;">Tipo de Muestra</th>
+                                    <th style="padding: 12px; text-align: left; color: white; font-weight: 700;">Volumen</th>
+                                    <th style="padding: 12px; text-align: left; color: white; font-weight: 700;">Técnica de Recolección</th>
+                                    <th style="padding: 12px; text-align: left; color: white; font-weight: 700;">Almacenamiento</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody_muestras_evento">
+                                <tr><td colspan="5" style="text-align: center; padding: 15px; color: #64748b;">Selecciona un evento para ver muestras requeridas</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h3>MUESTRAS RESPIRATORIAS - INFORMACIÓN GENERAL</h3>
+                        <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                            <strong>Hisopado Nasofaríngeo (NPS):</strong><br>
+                            • USO: COVID-19, Influenza, Sarampión<br>
+                            • TÉCNICA: Insertar hisopo hasta nasofaringe, girar 360°×15s<br>
+                            • ALMACENAMIENTO: 2-8°C máximo 48 horas<br>
+                            <br>
+                            <strong>Hisopado Orofaríngeo (OPS):</strong><br>
+                            • USO: COVID-19, Dengue (NS1), Sarampión<br>
+                            • TÉCNICA: Tocar amígdalas y garganta, girar 360°×15s<br>
+                            • ALMACENAMIENTO: 2-8°C máximo 48 horas<br>
+                            <br>
+                            <strong>Esputo:</strong><br>
+                            • USO: Tuberculosis (Baciloscopía)<br>
+                            • TÉCNICA: Paciente tose profundamente, esputo profundo (no saliva)<br>
+                            • VOLUMEN: 5-10 mL × 3 muestras<br>
+                            • ALMACENAMIENTO: Temp. ambiente <2 horas O refrigerar
+                        </div>
+
+                        <h3>MUESTRAS HEMATOLÓGICAS - INFORMACIÓN GENERAL</h3>
+                        <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                            <strong>Sangre Total (EDTA - Tapa Morada):</strong><br>
+                            • USO: Hemograma, PCR, Cultivos especiales<br>
+                            • VOLUMEN: 3-5 mL<br>
+                            • TÉCNICA: Llenar hasta línea de llenado, invertir 8-10 veces<br>
+                            • ALMACENAMIENTO: Temp. ambiente 24h O refrigerar<br>
+                            <br>
+                            <strong>Suero (Tapa Roja):</strong><br>
+                            • USO: Serología (IgM, IgG), Química clínica<br>
+                            • VOLUMEN: 5-10 mL<br>
+                            • TÉCNICA: Reposar 30min, centrifugar 3000RPM×10min<br>
+                            • ALMACENAMIENTO: 2-8°C máximo 72 horas<br>
+                            <br>
+                            <strong>Gota Gruesa (Malaria):</strong><br>
+                            • USO: Diagnóstico de Malaria<br>
+                            • TÉCNICA: Extender gota en portaobjetos, secar al aire<br>
+                            • CANTIDAD: 3 láminas en diferentes picos febriles<br>
+                            • TINCIÓN: Giemsa × lectura en 100x
+                        </div>
+
+                        <h3>MUESTRAS DE FLUIDOS - INFORMACIÓN GENERAL</h3>
+                        <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                            <strong>Líquido Cefalorraquídeo (LCR):</strong><br>
+                            • USO: Meningitis, Encefalitis<br>
+                            • RECOLECCIÓN: Solo por médico (punción lumbar)<br>
+                            • VOLUMEN: 1-5 mL<br>
+                            • TRANSPORTE: URGENTE máximo 30 minutos<br>
+                            • NO REFRIGERAR<br>
+                            <br>
+                            <strong>Orina:</strong><br>
+                            • USO: Químico clínico, Cultivos especiales<br>
+                            • VOLUMEN: 30-50 mL<br>
+                            • TÉCNICA: Higiene genital, primer chorro al sanitario, chorro medio<br>
+                            • ALMACENAMIENTO: 2-8°C máximo 48 horas
+                        </div>
+
+                        <h3>PRINCIPIOS CLAVE</h3>
+                        <div style="background: #dbeafe; padding: 15px; border-radius: 6px;">
+                            ✓ IDENTIFICACIÓN: Etiqueta con nombre, ID, fecha/hora<br>
+                            ✓ TRANSPORTE: Temperatura, tiempo, contenedor seguro<br>
+                            ✓ CADENA DE CUSTODIA: Registrar recepción, hora, firma<br>
+                            ✓ RECHAZO: Muestras sin ID, contenedor inapropiado, tiempo excedido
+                        </div>
+                    </div>
+                </div>
+
+                    <p style="color: #64748b; font-size: 12px; margin-top: 20px;">📖 Basado en Manuales técnicos INS y Procedimientos de laboratorio</p>
+                </div>
+                </div>
+            </div>
+
+            <div class="view" id="registrar">
+                <h2>📝 Registrar Muestra</h2>
+                <div class="card">
+                    <div class="card">
+                        <h3>Registrar Nueva Muestra</h3>
+                        
+                        <div class="form-group">
+                            <label>ID de Muestra (AUTO-GENERADO) *</label>
+                            <input type="text" id="reg_idMuestra" placeholder="MU-2024-XXX" disabled style="background: #f0fdf4; font-weight: 600;">
+                            <small style="color: #64748b; font-size: 12px;">Se genera automáticamente al registrar</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nombre Paciente *</label>
+                            <input type="text" id="reg_nombrePaciente" placeholder="Nombre completo">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Documento de Identidad (CC, TI, etc.) *</label>
+                            <input type="text" id="reg_documento" placeholder="Ej: 1234567890">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Edad *</label>
+                            <input type="number" id="reg_edad" placeholder="Edad en años">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Sexo *</label>
+                            <select id="reg_sexo">
+                                <option value="">Selecciona sexo...</option>
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Evento Sospechoso * (Selecciona primero para actualizar síntomas)</label>
+                            <select id="reg_evento" onchange="actualizarSintomasEventoReg()">
+                                <option value="">Selecciona evento...</option>
+                                <option value="dengue">🦟 Dengue (210)</option>
+                                <option value="covid">🦠 COVID-19 (715)</option>
+                                <option value="tuberculosis">🔬 Tuberculosis (220)</option>
+                                <option value="sarampion">📊 Sarampión (730)</option>
+                                <option value="malaria">🦟 Malaria (330)</option>
+                                <option value="influenza">🦠 Influenza (252)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Síntomas Principales (MULTISELECT - se actualizan según evento) *</label>
+                            <select id="reg_sintomas" multiple style="height: 120px; padding: 10px;">
+                                <option value="">Selecciona un evento primero...</option>
+                            </select>
+                            <small style="color: #64748b; font-size: 12px;">Mantén Ctrl/Cmd y click para seleccionar múltiples</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Fecha Inicio Síntomas *</label>
+                            <input type="date" id="reg_fechaSintomas">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tipo de Muestra (MULTISELECT - pueden ser varias para un caso) *</label>
+                            <select id="reg_tipoMuestra" multiple style="height: 120px; padding: 10px;" onchange="actualizarTiposMuestraReg()">
+                                <option value="">Selecciona un evento primero...</option>
+                            </select>
+                            <small style="color: #64748b; font-size: 12px;">⚠️ Nota: Puedes seleccionar múltiples tipos (Ej: Sarampión = Suero + Orina + Hisopado)</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>¿Requiere Referencia al LSP?</label>
+                            <select id="reg_referencia">
+                                <option value="si">Sí - Enviar al LSP</option>
+                                <option value="no">No - Solo análisis local</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Resultado Prueba Local *</label>
+                            <select id="reg_resultadoLocal">
+                                <option value="">Selecciona resultado...</option>
+                                <option value="positivo">Positivo</option>
+                                <option value="negativo">Negativo</option>
+                                <option value="pendiente">Pendiente</option>
+                                <option value="indeterminado">Indeterminado</option>
+                            </select>
+                        </div>
+
+                        <button class="btn-primary" onclick="registrarMuestra()">✅ Registrar Muestra</button>
+                    </div>
+
+                    <div class="card">
+                        <h3>Últimas Muestras Registradas</h3>
+                        <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                            <strong>🔍 Filtrar por Evento:</strong><br><br>
+                            <select id="reg_filtro_evento" onchange="filtrarMuestrasRegistrado()" style="max-width: 300px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px;">
+                                <option value="">TODAS LAS MUESTRAS</option>
+                                <option value="dengue">Dengue</option>
+                                <option value="covid">COVID-19</option>
+                                <option value="tuberculosis">Tuberculosis</option>
+                                <option value="sarampion">Sarampión</option>
+                                <option value="malaria">Malaria</option>
+                                <option value="influenza">Influenza</option>
+                            </select>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Paciente</th>
+                                    <th>Evento</th>
+                                    <th>Tipo Muestra</th>
+                                    <th>Resultado Local</th>
+                                    <th>LSP</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla_muestrasRegistradas">
+                                <tr><td colspan="6" style="text-align: center; color: #64748b;">Sin muestras registradas aún</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="view" id="referencia">
+                <h2>↔️ Referencia al LSP</h2>
+
+                <div class="card" style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 250px;">
+                            <strong>🔍 Filtrar Muestras Referidas por Evento:</strong><br><br>
+                            <select id="ref_filtro_evento" onchange="filtrarMuestrasReferencia()" style="width: 100%; max-width: 300px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px;">
+                                <option value="">TODOS LOS EVENTOS</option>
+                                <option value="dengue">Dengue</option>
+                                <option value="covid">COVID-19</option>
+                                <option value="tuberculosis">Tuberculosis</option>
+                                <option value="sarampion">Sarampión</option>
+                                <option value="malaria">Malaria</option>
+                                <option value="influenza">Influenza</option>
+                            </select>
+                        </div>
+                        <button onclick="descargarExcelReferencia()" style="padding: 10px 20px; background: linear-gradient(135deg, #16a34a, #10b981); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; height: fit-content;">
+                            📥 Descargar Excel Referencia-Contrarreferencia
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Muestras Referidas (Filtradas por Evento)</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>ID Muestra</th>
+                                <th>Paciente</th>
+                                <th>Evento</th>
+                                <th>Resultado Local</th>
+                                <th>Estado LSP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ref_tabla_filtrada">
+                            <tr><td colspan="6" style="text-align: center; color: #64748b;">Selecciona un evento para ver muestras</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b;">
+                    <h3>📋 Ficha de Notificación EISP - Códigos de Eventos de Interés en Salud Pública</h3>
+                    <p style="color: #92400e; margin-bottom: 15px; font-size: 14px;">
+                        <strong>Resolución 1646/2013 MSPS - Obligatorio notificar dentro de 24 horas de confirmación</strong>
+                    </p>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                                <th style="padding: 12px; text-align: left; color: white; font-weight: 700;">Código</th>
+                                <th style="padding: 12px; text-align: left; color: white; font-weight: 700;">Evento de Interés</th>
+                                <th style="padding: 12px; text-align: left; color: white; font-weight: 700;">Tipo de Notificación</th>
+                                <th style="padding: 12px; text-align: left; color: white; font-weight: 700;">Plazo Máximo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #fcd34d;">
+                                <td style="padding: 12px; background: #fffbeb;"><strong>210</strong></td>
+                                <td style="padding: 12px; background: #fffbeb;">Dengue (confirmado, probable)</td>
+                                <td style="padding: 12px; background: #fffbeb;">Notificación Inmediata</td>
+                                <td style="padding: 12px; background: #fffbeb;">24 horas</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #fcd34d;">
+                                <td style="padding: 12px;"><strong>715</strong></td>
+                                <td style="padding: 12px;">COVID-19 (confirmado por PCR-RT)</td>
+                                <td style="padding: 12px;">Notificación Inmediata</td>
+                                <td style="padding: 12px;">24 horas</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #fcd34d;">
+                                <td style="padding: 12px; background: #fffbeb;"><strong>220</strong></td>
+                                <td style="padding: 12px; background: #fffbeb;">Tuberculosis (activa pulmonar, extrapulmonar)</td>
+                                <td style="padding: 12px; background: #fffbeb;">Notificación Obligatoria</td>
+                                <td style="padding: 12px; background: #fffbeb;">1 semana</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #fcd34d;">
+                                <td style="padding: 12px;"><strong>730</strong></td>
+                                <td style="padding: 12px;">Sarampión (confirmado, probable)</td>
+                                <td style="padding: 12px;">Notificación Inmediata</td>
+                                <td style="padding: 12px;">24 horas</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #fcd34d;">
+                                <td style="padding: 12px; background: #fffbeb;"><strong>330</strong></td>
+                                <td style="padding: 12px; background: #fffbeb;">Malaria (confirmado por laboratorio)</td>
+                                <td style="padding: 12px; background: #fffbeb;">Notificación Inmediata</td>
+                                <td style="padding: 12px; background: #fffbeb;">24 horas</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #fcd34d;">
+                                <td style="padding: 12px;"><strong>715</strong></td>
+                                <td style="padding: 12px;">Influenza (confirmado por PCR-RT)</td>
+                                <td style="padding: 12px;">Notificación Obligatoria</td>
+                                <td style="padding: 12px;">7 días</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p style="color: #92400e; margin-top: 15px; font-size: 12px;">
+                        <strong>📌 Nota:</strong> La notificación EISP es responsabilidad del laboratorio clínico y debe hacerse sin esperar confirmación del LSP.
+                        Todos los casos confirmados o probables deben notificarse obligatoriamente.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>Procedimiento de Envío al Laboratorio de Salud Pública</h3>
+                    
+                    <div style="background: #dcfce7; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <strong>✓ PASO 1: COORDINACIÓN</strong><br>
+                        • Llamar al LSP departamental<br>
+                        • Informar del caso sospechoso<br>
+                        • Confirmar disponibilidad pruebas<br>
+                        • Coordinar transporte<br>
+                        • Obtener número de registro LSP
+                    </div>
+
+                    <div style="background: #dcfce7; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <strong>✓ PASO 2: PREPARACIÓN DE MUESTRA</strong><br>
+                        • Doble empaque (contención primaria + secundaria)<br>
+                        • Etiquetado correcto con datos paciente<br>
+                        • Formulario EISP completo<br>
+                        • Datos clínicos e información epidemiológica<br>
+                        • Contacto médico solicitante
+                    </div>
+
+                    <div style="background: #dcfce7; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <strong>✓ PASO 3: EMPAQUE SEGÚN BIOSEGURIDAD</strong><br>
+                        • Categoría A: Sustancia Infecciosa<br>
+                        • Caja cartón corrugado doble pared<br>
+                        • Absorbentes (aserrín, papel periódico)<br>
+                        • Sello de riesgo biológico<br>
+                        • Etiqueta "SUSTANCIA INFECCIOSA"<br>
+                        • Temperatura 2-8°C (generalmente)
+                    </div>
+
+                    <div style="background: #dcfce7; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <strong>✓ PASO 4: TRANSPORTE</strong><br>
+                        • Usar transporte especializado si es posible<br>
+                        • Mantener temperatura 2-8°C<br>
+                        • Respetar tiempos máximos según tipo muestra<br>
+                        • Registrar envío con comprobante<br>
+                        • Verificar recepción en LSP
+                    </div>
+
+                    <div style="background: #dcfce7; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <strong>✓ PASO 5: RECEPCIÓN EN LSP</strong><br>
+                        • Verificar integridad empaque<br>
+                        • Registrar hora y fecha recepción<br>
+                        • Verificar datos muestra coincidan<br>
+                        • Almacenamiento apropiado<br>
+                        • Inicio procesamiento inmediato
+                    </div>
+
+                    <div style="background: #dcfce7; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <strong>✓ PASO 6: RESULTADOS</strong><br>
+                        • Informe de laboratorio con confirmación<br>
+                        • Tipificación si aplica (especie, subtipo)<br>
+                        • Recomendaciones clínicas<br>
+                        • Retorno de resultados < 7 días<br>
+                        • Comunicación con laboratorio remitente
+                    </div>
+
+                    <h3>Requisitos Administrativos</h3>
+                    <div style="background: #fef3c7; padding: 15px; border-radius: 6px;">
+                        <strong>FORMULARIO EISP DEBE INCLUIR:</strong><br>
+                        ☐ Nombre completo paciente<br>
+                        ☐ Número de identificación<br>
+                        ☐ Edad y sexo<br>
+                        ☐ Procedencia/municipio<br>
+                        ☐ Síntomas y fecha inicio<br>
+                        ☐ Resultado prueba local<br>
+                        ☐ Tipo de muestra<br>
+                        ☐ Fecha/hora recolección<br>
+                        ☐ Datos contacto médico<br>
+                        ☐ Firma y sello de responsable
+                    </div>
+
+                    <h3>Contactos LSP por Departamento</h3>
+                    <table>
+                        <tr style="background: #f0f9ff;">
+                            <th>Departamento</th>
+                            <th>Contacto/Teléfono</th>
+                        </tr>
+                        <tr>
+                            <td>Bogotá D.C.</td>
+                            <td>LSP Bogotá - 1-XXXXXXX</td>
+                        </tr>
+                        <tr>
+                            <td>Cundinamarca</td>
+                            <td>LSP Regional - XX-XXXXXX</td>
+                        </tr>
+                        <tr>
+                            <td>Antioquia</td>
+                            <td>LSP Medellín - 4-XXXXXXX</td>
+                        </tr>
+                        <tr>
+                            <td>Valle del Cauca</td>
+                            <td>LSP Cali - 2-XXXXXXX</td>
+                        </tr>
+                        <tr>
+                            <td>Atlántico</td>
+                            <td>LSP Barranquilla - 5-XXXXXXX</td>
+                        </tr>
+                    </table>
+
+                    <p style="color: #64748b; font-size: 12px; margin-top: 20px;">📖 Basado en Procedimientos INS y Resoluciones vigentes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+    <script>
+        // Esperar a que XLSX esté disponible
+        window.addEventListener('load', function() {
+            let attempts = 0;
+            const maxAttempts = 50; // 5 segundos máximo
+            
+            const checkXLSX = setInterval(function() {
+                if (typeof XLSX !== 'undefined') {
+                    console.log('✅ SheetJS XLSX cargado correctamente');
+                    clearInterval(checkXLSX);
+                } else {
+                    attempts++;
+                    if (attempts >= maxAttempts) {
+                        console.warn('⚠️ SheetJS XLSX no se pudo cargar. Usando CSV como fallback.');
+                        clearInterval(checkXLSX);
+                    }
+                }
+            }, 100);
+        });
+    </script>
+    <script>
+        let currentUser = null;
+        let currentUserLab = null;
+
+        // ═══════════════════════════════════════════════════════════
+        // LOGIN
+        // ═══════════════════════════════════════════════════════════
+        function handleLogin() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            // Validar credenciales
+            const validUsers = {
+                'LAB001': 'Lab@2024',
+                'LAB002': 'Lab@2024',
+                'LAB003': 'Lab@2024'
+            };
+
+            if (validUsers[username] === password) {
+                currentUser = username;
+                currentUserLab = {
+                    'LAB001': 'Laboratorio Central Bogotá',
+                    'LAB002': 'Laboratorio de Referencia Regional',
+                    'LAB003': 'Laboratorio Privado San José'
+                }[username];
+
+                sessionStorage.setItem('currentUser', username);
+                sessionStorage.setItem('currentUserLab', currentUserLab);
+
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('appContainer').classList.add('active');
+
+                try {
+                    cargarDatosFicticios();
+                    updateDashboard();
+                    actualizarMuestrasReferidas();
+                    actualizarTablaRegistro();
+                    // actualizarEstadisticasExcel(); // Comentado temporalmente
+                } catch(error) {
+                    console.error('Error en login:', error);
+                    alert('⚠️ Error al cargar la aplicación: ' + error.message);
+                }
+            } else {
+                alert('⚠️ Usuario o contraseña incorrectos');
+            }
+        }
+
+        function handleLogout() {
+            sessionStorage.clear();
+            document.getElementById('appContainer').classList.remove('active');
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('username').value = 'LAB001';
+            document.getElementById('password').value = 'Lab@2024';
+            currentUser = null;
+        }
+
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+        }
+
+        function setActive(element) {
+            document.querySelectorAll('.sidebar-item').forEach(e => e.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // ALMACENAMIENTO
+        // ═══════════════════════════════════════════════════════════
+        function getSamples() {
+            const key = `samples_${currentUser}`;
+            return JSON.parse(localStorage.getItem(key) || '[]');
+        }
+
+        function saveSamples(samples) {
+            const key = `samples_${currentUser}`;
+            localStorage.setItem(key, JSON.stringify(samples));
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // DATOS FICTICIOS
+        // ═══════════════════════════════════════════════════════════
+        function cargarDatosFicticios() {
+            const key = `samples_${currentUser}`;
+            if (localStorage.getItem(key)) return;
+
+            const muestras = [
+                { id: '1', registroFecha: '2024-07-26', nombrePaciente: 'Juan Pérez', idMuestra: 'MU-2024-001', evento: 'dengue', resultadoLocal: 'positivo', requiereReferencia: 'si' },
+                { id: '2', registroFecha: '2024-07-26', nombrePaciente: 'María López', idMuestra: 'MU-2024-002', evento: 'covid', resultadoLocal: 'positivo', requiereReferencia: 'si', resultadoLSP: 'positivo' },
+                { id: '3', registroFecha: '2024-07-26', nombrePaciente: 'Carlos Mendoza', idMuestra: 'MU-2024-003', evento: 'tuberculosis', resultadoLocal: 'pendiente', requiereReferencia: 'si' },
+                { id: '4', registroFecha: '2024-07-26', nombrePaciente: 'Ana Martínez', idMuestra: 'MU-2024-004', evento: 'sarampion', resultadoLocal: 'positivo', requiereReferencia: 'si' },
+                { id: '5', registroFecha: '2024-07-25', nombrePaciente: 'David Ruiz', idMuestra: 'MU-2024-005', evento: 'malaria', resultadoLocal: 'positivo', requiereReferencia: 'si', resultadoLSP: 'negativo' },
+                { id: '6', registroFecha: '2024-07-25', nombrePaciente: 'Isabel García', idMuestra: 'MU-2024-006', evento: 'dengue', resultadoLocal: 'positivo', requiereReferencia: 'si' },
+                { id: '7', registroFecha: '2024-07-24', nombrePaciente: 'Roberto Gómez', idMuestra: 'MU-2024-007', evento: 'covid', resultadoLocal: 'negativo', requiereReferencia: 'no' },
+                { id: '8', registroFecha: '2024-07-24', nombrePaciente: 'Patricia Díaz', idMuestra: 'MU-2024-008', evento: 'covid', resultadoLocal: 'positivo', requiereReferencia: 'si', resultadoLSP: 'positivo' },
+                { id: '9', registroFecha: '2024-07-24', nombrePaciente: 'Miguel Santos', idMuestra: 'MU-2024-009', evento: 'sarampion', resultadoLocal: 'negativo', requiereReferencia: 'no' },
+                { id: '10', registroFecha: '2024-07-23', nombrePaciente: 'Laura Fernández', idMuestra: 'MU-2024-010', evento: 'dengue', resultadoLocal: 'positivo', requiereReferencia: 'si' }
+            ];
+
+            saveSamples(muestras);
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // FILTRADO Y BÚSQUEDA POR EVENTO
+        // ═══════════════════════════════════════════════════════════
+        function updateDashboardFiltrado() {
+            const eventoFiltro = document.getElementById('dash_filtro_evento').value;
+            const samples = getSamples().filter(s => !eventoFiltro || s.evento === eventoFiltro);
+
+            const stats = {
+                total: samples.length,
+                referidas: samples.filter(s => s.requiereReferencia === 'si').length,
+                conResultado: samples.filter(s => s.requiereReferencia === 'si' && s.resultadoLSP).length,
+                pendientes: samples.filter(s => s.requiereReferencia === 'si' && !s.resultadoLSP).length
+            };
+
+            document.getElementById('statTotal').textContent = stats.total;
+            document.getElementById('statReferidas').textContent = stats.referidas;
+            document.getElementById('statConResultado').textContent = stats.conResultado;
+            document.getElementById('statPendientes').textContent = stats.pendientes;
+
+            updateEventChart(samples);
+            updateDashboardTable(samples);
+        }
+
+        function filtrarMuestras() {
+            const eventoFiltro = document.getElementById('busq_evento').value;
+            const resultadoFiltro = document.getElementById('busq_resultado').value;
+            const referenciaFiltro = document.getElementById('busq_referencia').value;
+            const pacienteFiltro = document.getElementById('busq_paciente').value.toLowerCase();
+
+            let samples = getSamples();
+
+            // Aplicar filtros
+            if (eventoFiltro) {
+                samples = samples.filter(s => s.evento === eventoFiltro);
+            }
+            if (resultadoFiltro) {
+                samples = samples.filter(s => s.resultadoLocal === resultadoFiltro);
+            }
+            if (referenciaFiltro) {
+                samples = samples.filter(s => s.requiereReferencia === referenciaFiltro);
+            }
+            if (pacienteFiltro) {
+                samples = samples.filter(s => 
+                    s.nombrePaciente.toLowerCase().includes(pacienteFiltro) ||
+                    s.documento.toLowerCase().includes(pacienteFiltro)
+                );
+            }
+
+            // Mostrar resultados
+            mostrarResultadosBusqueda(samples);
+        }
+
+        function mostrarResultadosBusqueda(muestras) {
+            const tbody = document.getElementById('busq_tabla');
+            document.getElementById('busq_resultado_count').textContent = muestras.length;
+            document.getElementById('busq_totalEncontrados').textContent = muestras.length;
+
+            const positivos = muestras.filter(m => m.resultadoLocal === 'positivo').length;
+            const negativos = muestras.filter(m => m.resultadoLocal === 'negativo').length;
+            const pendientes = muestras.filter(m => m.resultadoLocal === 'pendiente').length;
+
+            document.getElementById('busq_positivos').textContent = positivos;
+            document.getElementById('busq_negativos').textContent = negativos;
+            document.getElementById('busq_pendientes').textContent = pendientes;
+
+            if (muestras.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #64748b;">No hay muestras que coincidan con los filtros</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = muestras.map(m => `
+                <tr>
+                    <td>${m.registroFecha}</td>
+                    <td><strong>${m.idMuestra}</strong></td>
+                    <td>${m.nombrePaciente}</td>
+                    <td><strong>${m.evento}</strong></td>
+                    <td>
+                        ${m.resultadoLocal === 'positivo' ? '<span class="badge badge-red">Positivo</span>' :
+                          m.resultadoLocal === 'negativo' ? '<span class="badge badge-green">Negativo</span>' :
+                          m.resultadoLocal === 'pendiente' ? '<span class="badge badge-blue">Pendiente</span>' :
+                          '<span class="badge badge-blue">Indeterminado</span>'}
+                    </td>
+                    <td>${m.requiereReferencia === 'si' ? '<span class="badge badge-blue">Sí</span>' : '<span class="badge badge-green">No</span>'}</td>
+                    <td>${m.resultadoLSP ? `<span class="badge badge-green">${m.resultadoLSP}</span>` : '<span class="badge badge-blue">Pendiente</span>'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function filtrarMuestrasReferencia() {
+            const eventoFiltro = document.getElementById('ref_filtro_evento').value;
+            const samples = getSamples().filter(s => s.requiereReferencia === 'si');
+            const filtradas = eventoFiltro ? samples.filter(s => s.evento === eventoFiltro) : samples;
+
+            const tbody = document.getElementById('ref_tabla_filtrada');
+            if (filtradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b;">No hay muestras de este evento</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtradas.map(m => `
+                <tr>
+                    <td>${m.registroFecha}</td>
+                    <td>${m.idMuestra}</td>
+                    <td>${m.nombrePaciente}</td>
+                    <td><strong>${m.evento}</strong></td>
+                    <td>
+                        ${m.resultadoLocal === 'positivo' ? '<span class="badge badge-red">Positivo</span>' :
+                          m.resultadoLocal === 'negativo' ? '<span class="badge badge-green">Negativo</span>' :
+                          '<span class="badge badge-blue">Pendiente</span>'}
+                    </td>
+                    <td>${m.resultadoLSP || 'Esperando...'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function filtrarMuestrasContrarreferencia() {
+            const eventoFiltro = document.getElementById('contra_filtro_evento').value;
+            const samples = getSamples().filter(s => s.requiereReferencia === 'si');
+            const filtradas = eventoFiltro ? samples.filter(s => s.evento === eventoFiltro) : samples;
+
+            const tbody = document.getElementById('muestrasReferidas');
+            if (filtradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b;">No hay muestras referidas de este evento</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtradas.map(m => `
+                <tr>
+                    <td>${m.registroFecha}</td>
+                    <td>${m.idMuestra}</td>
+                    <td>${m.nombrePaciente}</td>
+                    <td><strong>${m.evento}</strong></td>
+                    <td>${m.resultadoLSP ? '✅ Resultado recibido' : '⏳ Pendiente'}</td>
+                    <td><button class="btn-primary" onclick="document.getElementById('muestra_id').value='${m.idMuestra}'" style="font-size: 12px; padding: 5px 10px;">Usar</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function filtrarMuestrasRegistrado() {
+            const eventoFiltro = document.getElementById('reg_filtro_evento').value;
+            const samples = getSamples();
+            const filtradas = eventoFiltro ? samples.filter(s => s.evento === eventoFiltro) : samples;
+
+            const tbody = document.getElementById('tabla_muestrasRegistradas');
+            
+            if (filtradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b;">Sin muestras de este evento</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtradas.slice(-10).reverse().map(s => `
+                <tr>
+                    <td>${s.registroFecha}</td>
+                    <td>${s.nombrePaciente}</td>
+                    <td>${s.evento}</td>
+                    <td>${s.tipoMuestra}</td>
+                    <td>
+                        ${s.resultadoLocal === 'positivo' ? '<span class="badge badge-red">Positivo</span>' :
+                          s.resultadoLocal === 'negativo' ? '<span class="badge badge-green">Negativo</span>' :
+                          s.resultadoLocal === 'pendiente' ? '<span class="badge badge-blue">Pendiente</span>' :
+                          '<span class="badge badge-blue">Indeterminado</span>'}
+                    </td>
+                    <td>${s.requiereReferencia === 'si' ? '<span class="badge badge-blue">Sí</span>' : '<span class="badge badge-green">No</span>'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function filtrarDefiniciones() {
+            const evento = document.getElementById('def_filtro_evento').value;
+            const cards = document.querySelectorAll('#def_contenido .card[data-evento]');
+            
+            cards.forEach(card => {
+                if (!evento || card.dataset.evento === evento) {
+                    card.style.display = 'block';
+                    card.style.animation = 'fadeIn 0.4s ease-out';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function filtrarAlgoritmos() {
+            const evento = document.getElementById('algo_filtro_evento').value;
+            const cards = document.querySelectorAll('#algo_contenido .card[data-evento]');
+            
+            cards.forEach(card => {
+                if (!evento || card.dataset.evento === evento) {
+                    card.style.display = 'block';
+                    card.style.animation = 'fadeIn 0.4s ease-out';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function filtrarMuestrascontenido() {
+            const evento = document.getElementById('mue_filtro_evento').value;
+            const cards = document.querySelectorAll('#mue_contenido .card[data-evento]');
+            
+            cards.forEach(card => {
+                if (!evento || card.dataset.evento === evento) {
+                    card.style.display = 'block';
+                    card.style.animation = 'fadeIn 0.4s ease-out';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // DASHBOARD
+        // ═══════════════════════════════════════════════════════════
+        function updateDashboard() {
+            const samples = getSamples();
+
+            const stats = {
+                total: samples.length,
+                referidas: samples.filter(s => s.requiereReferencia === 'si').length,
+                conResultado: samples.filter(s => s.requiereReferencia === 'si' && s.resultadoLSP).length,
+                pendientes: samples.filter(s => s.requiereReferencia === 'si' && !s.resultadoLSP).length
+            };
+
+            document.getElementById('statTotal').textContent = stats.total;
+            document.getElementById('statReferidas').textContent = stats.referidas;
+            document.getElementById('statConResultado').textContent = stats.conResultado;
+            document.getElementById('statPendientes').textContent = stats.pendientes;
+
+            updateEventChart(samples);
+            updateDashboardTable(samples);
+        }
+
+        function updateEventChart(samples) {
+            const eventCounts = {};
+            samples.forEach(s => {
+                eventCounts[s.evento] = (eventCounts[s.evento] || 0) + 1;
+            });
+
+            const chart = document.getElementById('eventChart');
+            chart.innerHTML = '';
+            const maxCount = Math.max(...Object.values(eventCounts), 1);
+
+            const eventos = Object.keys(eventCounts);
+            const colores = {
+                dengue: 'linear-gradient(135deg, #f87171, #dc2626)',
+                covid: 'linear-gradient(135deg, #60a5fa, #0284c7)',
+                tuberculosis: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                malaria: 'linear-gradient(135deg, #a78bfa, #8b5cf6)',
+                sarampion: 'linear-gradient(135deg, #34d399, #10b981)',
+                influenza: 'linear-gradient(135deg, #f472b6, #ec4899)'
+            };
+            
+            const icons = { 
+                dengue: '🦟', 
+                covid: '🦠', 
+                tuberculosis: '🔬', 
+                malaria: '🦟', 
+                sarampion: '📊',
+                influenza: '🤒'
+            };
+
+            eventos.forEach(evento => {
+                const count = eventCounts[evento];
+                const height = (count / maxCount) * 160;
+                const bar = document.createElement('div');
+                bar.innerHTML = `
+                    <div style="
+                        background: ${colores[evento] || 'linear-gradient(135deg, #16a34a, #10b981)'};
+                        height: ${height}px;
+                        width: 50px;
+                        border-radius: 12px 12px 0 0;
+                        margin-bottom: 10px;
+                        transition: all 0.3s;
+                        cursor: pointer;
+                        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                        position: relative;
+                    " 
+                    onmouseover="this.style.height='${height + 10}px'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.3)'; this.style.transform='translateY(-5px)';"
+                    onmouseout="this.style.height='${height}px'; this.style.boxShadow='0 5px 15px rgba(0, 0, 0, 0.2)'; this.style.transform='translateY(0)';">
+                        <div style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-weight: 800; color: var(--text); font-size: 14px;">${count}</div>
+                    </div>
+                    <div style="text-align: center; font-size: 32px; margin-bottom: 8px;">${icons[evento]}</div>
+                    <div style="text-align: center; font-size: 12px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: 0.5px;">${evento}</div>
+                `;
+                bar.style.textAlign = 'center';
+                chart.appendChild(bar);
+            });
+        }
+
+        function updateDashboardTable(samples) {
+            const tbody = document.getElementById('dashboardTable');
+            const referidas = samples.filter(s => s.requiereReferencia === 'si');
+            const recent = referidas.slice(-5).reverse();
+
+            tbody.innerHTML = recent.map(s => `
+                <tr>
+                    <td>${s.registroFecha}</td>
+                    <td><strong>${s.idMuestra}</strong></td>
+                    <td>${s.nombrePaciente}</td>
+                    <td>${s.evento}</td>
+                    <td>
+                        ${s.resultadoLocal === 'positivo' ? '<span class="badge badge-red">✅ Positivo</span>' :
+                          s.resultadoLocal === 'negativo' ? '<span class="badge badge-green">❌ Negativo</span>' :
+                          '<span class="badge badge-blue">⏳ Pendiente</span>'}
+                    </td>
+                    <td>
+                        ${s.resultadoLSP ? `<span class="badge badge-green">${s.resultadoLSP}</span>` :
+                          '<span class="badge badge-blue">Esperando...</span>'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // IA - ANÁLISIS PROFESIONAL PROTOCOLOS INS
+        // ═══════════════════════════════════════════════════════════
+        function analizarCasoConIA() {
+            const sintomas = document.getElementById('casoSintomas').value.trim();
+            const datos = document.getElementById('casoDatos').value.trim();
+            const hallazgos = document.getElementById('casoHallazgos').value.trim();
+
+            const resultado = document.getElementById('resultadosAsesoria');
+            resultado.style.display = 'block';
+            resultado.innerHTML = `
+                <div style="text-align: center; padding: 50px 30px;">
+                    <div style="
+                        width: 60px;
+                        height: 60px;
+                        border: 5px solid rgba(22, 163, 74, 0.2);
+                        border-top: 5px solid #16a34a;
+                        border-radius: 50%;
+                        margin: 0 auto 30px;
+                        animation: spin 1s linear infinite;
+                    "></div>
+                    <h3 style="color: var(--text); margin-bottom: 10px;">🔬 Analizando caso con Protocolos INS...</h3>
+                    <p style="color: var(--text-soft); margin: 0;">Evaluando criterios diagnósticos y algoritmos...</p>
+                    <style>
+                        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                    </style>
+                </div>
+            `;
+
+            setTimeout(() => {
+                const analisis = generarAnalisisSegunINS(sintomas, datos, hallazgos);
+                mostrarResultadosIA(analisis);
+            }, 2000);
+        }
+
+        function mostrarResultadosIA(analisis) {
+            if (analisis.error) {
+                document.getElementById('resultadosAsesoria').innerHTML = `
+                    <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; padding: 25px; border-radius: 12px; animation: slideIn 0.4s ease-out;">
+                        <h3 style="color: #b45309; margin-top: 0; font-size: 18px;">⚠️ ${analisis.mensaje}</h3>
+                        <p style="color: #92400e; margin: 10px 0;">${analisis.descripcion}</p>
+                        <h4 style="color: #b45309; margin-top: 15px;">📋 Completa:</h4>
+                        <ul style="margin: 10px 0; color: #92400e;">
+                            ${analisis.validar.map(v => `<li style="margin: 5px 0;">${v}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div style="animation: fadeIn 0.5s ease-out;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);">
+                        <h2 style="margin-top: 0; -webkit-text-fill-color: white; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);">🔬 ANÁLISIS SEGÚN PROTOCOLOS INS</h2>
+                        <div style="font-size: 16px; margin: 10px 0; background: rgba(255, 255, 255, 0.2); padding: 10px 15px; border-radius: 8px; backdrop-filter: blur(10px);">
+                            <strong>Evento:</strong> <span style="font-size: 18px;">${analisis.evento}</span>
+                        </div>
+                        <div style="font-size: 16px; margin: 10px 0; background: rgba(255, 255, 255, 0.2); padding: 10px 15px; border-radius: 8px; backdrop-filter: blur(10px);">
+                            <strong>Clasificación:</strong> ${analisis.clasificacion}
+                        </div>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-left: 5px solid #0284c7; padding: 25px; margin: 15px 0; border-radius: 12px; box-shadow: 0 5px 20px rgba(2, 132, 199, 0.2);">
+                        <h3 style="color: #0c4a6e; margin-top: 0; display: flex; align-items: center;"><span style="font-size: 24px; margin-right: 10px;">📋</span> CRITERIOS DIAGNÓSTICOS (INS)</h3>
+                        <ul style="margin: 0; padding-left: 25px; color: #0c4a6e;">
+                            ${analisis.criteriosDiagnosticos.map(c => `<li style="margin: 8px 0; font-weight: 500;">${c}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #f5f3ff, #ede9fe); border-left: 5px solid #9333ea; padding: 25px; margin: 15px 0; border-radius: 12px; box-shadow: 0 5px 20px rgba(147, 51, 234, 0.2);">
+                        <h3 style="color: #6b21a8; margin-top: 0; display: flex; align-items: center;"><span style="font-size: 24px; margin-right: 10px;">🧪</span> PRUEBAS DIAGNÓSTICAS RECOMENDADAS</h3>
+                        <div style="background: white; padding: 15px; border-radius: 10px; color: #4c1d95; font-family: monospace; line-height: 1.8; white-space: pre-wrap; overflow-x: auto;">
+${analisis.pruebasDiagnosticas.join('\n')}
+                        </div>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); border-left: 5px solid #16a34a; padding: 25px; margin: 15px 0; border-radius: 12px; box-shadow: 0 5px 20px rgba(22, 163, 74, 0.2);">
+                        <h3 style="color: #15803d; margin-top: 0; display: flex; align-items: center;"><span style="font-size: 24px; margin-right: 10px;">✓</span> RECOMENDACIONES DE MANEJO</h3>
+                        <ul style="margin: 0; padding-left: 25px; color: #15803d;">
+                            ${analisis.recomendaciones.map(r => `<li style="margin: 8px 0; font-weight: 500;">${r}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #fee2e2, #fecaca); border-left: 5px solid #dc2626; padding: 25px; margin: 15px 0; border-radius: 12px; box-shadow: 0 5px 20px rgba(220, 38, 38, 0.2);">
+                        <h3 style="color: #991b1b; margin-top: 0; display: flex; align-items: center;"><span style="font-size: 24px; margin-right: 10px;">📧</span> NOTIFICACIÓN EISP (OBLIGATORIA)</h3>
+                        <div style="background: white; padding: 15px; border-radius: 10px; color: #7c2d12;">
+                            <p style="margin: 5px 0;"><strong>Evento:</strong> ${analisis.notificacionEISP.evento}</p>
+                            <p style="margin: 5px 0;"><strong>Código:</strong> <span style="background: #fee2e2; padding: 3px 8px; border-radius: 5px; font-weight: 700;">${analisis.notificacionEISP.codigo}</span></p>
+                            <p style="margin: 5px 0;"><strong>Tipo:</strong> ${analisis.notificacionEISP.tipoNotificacion}</p>
+                            <p style="color: #991b1b; margin: 10px 0 0 0; font-weight: bold; font-size: 16px;">⚠️ TIEMPO: Dentro de 24 horas (MÁXIMO)</p>
+                        </div>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #f1f5f9, #e2e8f0); padding: 20px; border-radius: 12px; margin-top: 20px; font-size: 13px; color: #475569; border: 1px solid #cbd5e1;">
+                        <strong>Fecha de análisis:</strong> ${analisis.fecha}<br>
+                        <strong>Basado en:</strong> ${analisis.basadoEn.join(' | ')}<br>
+                        <strong>Status:</strong> <span style="background: linear-gradient(135deg, #16a34a, #10b981); color: white; padding: 2px 8px; border-radius: 4px; font-weight: 600;">✓ ANÁLISIS COMPLETADO</span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('resultadosAsesoria').innerHTML = html;
+        }
+
+        function generarAnalisisSegunINS(sintomas, datos, hallazgos) {
+            const casoLower = (sintomas + ' ' + datos + ' ' + hallazgos).toLowerCase();
+
+            if (!sintomas.trim() && !hallazgos.trim()) {
+                return {
+                    error: true,
+                    mensaje: '⚠️ DATOS INCOMPLETOS',
+                    descripcion: 'Completa al menos los síntomas principales o hallazgos clínicos.',
+                    validar: [
+                        '✓ Síntomas principales (obligatorio)',
+                        '✓ Datos epidemiológicos: edad, sexo',
+                        '✓ Hallazgos clínicos si están disponibles'
+                    ]
+                };
+            }
+
+            let evento = null, clasificacion = null, criteriosDiagnosticos = [], pruebasDiagnosticas = [], recomendaciones = [], notificacionEISP = null;
+
+            // DENGUE
+            if (casoLower.includes('fiebre') && (casoLower.includes('cefalea') || casoLower.includes('dolor')) &&
+                (casoLower.includes('retrorbitario') || casoLower.includes('mialgias') || casoLower.includes('rash'))) {
+                evento = 'DENGUE';
+                clasificacion = '🟡 CASO SOSPECHOSO';
+                criteriosDiagnosticos = ['✓ Fiebre 2-7 días', '✓ Cefalea intensa', '✓ Dolor retrorbitario', '✓ Mialgias/artralgias', '✓ Rash'];
+                pruebasDiagnosticas = ['<5 días: NS1 Ag + PCR-RT', '5-10 días: IgM + IgG', '>10 días: IgG'];
+                recomendaciones = ['✓ NOTIFICACIÓN: < 24h', '✓ MANEJO: Sintomático', '✓ AISLAMIENTO: Bajo mosquitero', '✓ ENVÍO MUESTRA: LSP'];
+                notificacionEISP = { evento: 'DENGUE', codigo: '210', tipoNotificacion: 'Notificación Individual Obligatoria' };
+            }
+
+            // COVID-19
+            else if (casoLower.includes('fiebre') && (casoLower.includes('tos') || casoLower.includes('espectoracion') || casoLower.includes('disnea'))) {
+                evento = 'COVID-19 (SARS-CoV-2)';
+                clasificacion = '🟡 CASO SOSPECHOSO';
+                criteriosDiagnosticos = ['✓ Fiebre ≥38°C', '✓ Tos/espectoración', '✓ Síntomas respiratorios', '✓ Pérdida olfato/gusto (específico)'];
+                pruebasDiagnosticas = ['PRIORITARIO: PCR-RT', 'ALTERNATIVA: Antígeno rápido', 'Rx tórax si sospecha neumonía'];
+                recomendaciones = ['✓ AISLAMIENTO INMEDIATO', '✓ NOTIFICACIÓN: < 24h', '✓ MUESTRA: LSP urgente', '✓ RASTREO CONTACTOS'];
+                notificacionEISP = { evento: 'COVID-19', codigo: '715', tipoNotificacion: 'Notificación Individual Obligatoria' };
+            }
+
+            // TUBERCULOSIS
+            else if (casoLower.includes('tos') && (casoLower.includes('espectoracion') || casoLower.includes('hemoptisis') || casoLower.includes('productiva'))) {
+                evento = 'TUBERCULOSIS PULMONAR';
+                clasificacion = '🟡 CASO SOSPECHOSO';
+                criteriosDiagnosticos = ['✓ TOS ≥2 SEMANAS', '✓ Espectoración', '✓ Hemoptisis', '✓ Fiebre vespertina', '✓ Sudoración nocturna'];
+                pruebasDiagnosticas = ['URGENTES: Baciloscopía (3 muestras)', 'GeneXpert MTB/RIF', 'Radiografía tórax'];
+                recomendaciones = ['✓ AISLAMIENTO: Respiratorio', '✓ NOTIFICACIÓN INMEDIATA', '✓ INICIAR TRATAMIENTO sin esperar', '✓ Investigar contactos'];
+                notificacionEISP = { evento: 'TUBERCULOSIS', codigo: '220', tipoNotificacion: 'Notificación Individual Obligatoria' };
+            }
+
+            // SARAMPIÓN
+            else if (casoLower.includes('fiebre') && casoLower.includes('rash') && (casoLower.includes('tos') || casoLower.includes('coriza') || casoLower.includes('conjuntivitis'))) {
+                evento = 'SARAMPIÓN';
+                clasificacion = '🔴 CASO PROBABLE';
+                criteriosDiagnosticos = ['✓ Fiebre 3-4 días antes rash', '✓ Síntomas catarrales', '✓ Rash maculopapular', '✓ Patrón cefalocaudal'];
+                pruebasDiagnosticas = ['Serología IgM', 'PCR-RT nasofaríngeo', 'Diagnóstico clínico es suficiente'];
+                recomendaciones = ['✓ AISLAMIENTO: 4 días post rash', '✓ NOTIFICACIÓN URGENTE', '✓ BÚSQUEDA CONTACTOS inmediata', '✓ Vacunar susceptibles'];
+                notificacionEISP = { evento: 'SARAMPIÓN', codigo: '240', tipoNotificacion: 'Notificación Individual Obligatoria' };
+            }
+
+            // MALARIA
+            else if (casoLower.includes('fiebre') && (casoLower.includes('escalofrio') || casoLower.includes('sudor')) && (casoLower.includes('malaria') || casoLower.includes('palud') || casoLower.includes('endémica'))) {
+                evento = 'MALARIA';
+                clasificacion = '🟡 CASO SOSPECHOSO';
+                criteriosDiagnosticos = ['✓ Fiebre ≥38°C', '✓ Escalofríos', '✓ Sudoración profusa', '✓ Zona malariógena', '✓ Últimos 30 días exposición'];
+                pruebasDiagnosticas = ['URGENTE (<2h): Gota gruesa (3)', 'Frotis delgado (especie)', 'Test rápido'];
+                recomendaciones = ['✓ DIAGNÓSTICO URGENTE', '✓ NOTIFICACIÓN: < 24h', '✓ HOSPITALIZAR si grave', '✓ Tratamiento según especie'];
+                notificacionEISP = { evento: 'MALARIA', codigo: '230', tipoNotificacion: 'Notificación Individual Obligatoria' };
+            }
+
+            if (!evento) {
+                return {
+                    error: true,
+                    mensaje: '⚠️ NO SE IDENTIFICÓ EVENTO ESPECÍFICO',
+                    descripcion: 'Los síntomas no coinciden exactamente con eventos de vigilancia del INS.',
+                    validar: [
+                        '✓ Verifica síntomas principales completos',
+                        '✓ Incluye datos epidemiológicos',
+                        '✓ Ejemplos: DENGUE (fiebre+cefalea), COVID (fiebre+tos), TB (tos>2 semanas)'
+                    ]
+                };
+            }
+
+            return {
+                evento: evento,
+                clasificacion: clasificacion,
+                criteriosDiagnosticos: criteriosDiagnosticos,
+                pruebasDiagnosticas: pruebasDiagnosticas,
+                recomendaciones: recomendaciones,
+                notificacionEISP: notificacionEISP,
+                fecha: new Date().toLocaleString('es-CO'),
+                basadoEn: ['Protocolos INS', 'Guías MSPS', 'Fichas EISP']
+            };
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // INICIAR
+        // ═══════════════════════════════════════════════════════════
+        function actualizarMuestrasReferidas() {
+            const samples = getSamples();
+            const referidas = samples.filter(s => s.requiereReferencia === 'si');
+
+            const select = document.getElementById('muestra_id');
+            select.innerHTML = '<option value="">Selecciona una muestra...</option>';
+
+            const tbody = document.getElementById('muestrasReferidas');
+            tbody.innerHTML = referidas.map(m => `
+                <tr>
+                    <td>${m.registroFecha}</td>
+                    <td>${m.idMuestra}</td>
+                    <td>${m.nombrePaciente}</td>
+                    <td>${m.evento}</td>
+                    <td>${m.resultadoLSP ? '✅ Resultado recibido' : '⏳ Pendiente'}</td>
+                    <td><button class="btn-primary" onclick="document.getElementById('muestra_id').value='${m.idMuestra}'" style="font-size: 12px; padding: 5px 10px;">Usar</button></td>
+                </tr>
+            `).join('');
+
+            referidas.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.idMuestra;
+                opt.text = `${m.idMuestra} - ${m.nombrePaciente}`;
+                select.appendChild(opt);
+            });
+        }
+
+        function ingresarResultadoLSP() {
+            const idMuestra = document.getElementById('muestra_id').value;
+            const resultado = document.getElementById('resultado_lsp').value;
+
+            if (!idMuestra || !resultado) {
+                alert('⚠️ Selecciona muestra y resultado');
+                return;
+            }
+
+            let samples = getSamples();
+            samples = samples.map(s => {
+                if (s.idMuestra === idMuestra) {
+                    s.resultadoLSP = resultado;
+                }
+                return s;
+            });
+
+            saveSamples(samples);
+
+            // Limpiar formulario
+            document.getElementById('muestra_id').value = '';
+            document.getElementById('resultado_lsp').value = '';
+            document.getElementById('prueba_lsp').value = '';
+            document.getElementById('observaciones_lsp').value = '';
+
+            alert('✅ Resultado registrado');
+            updateDashboard();
+            actualizarMuestrasReferidas();
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // INICIAR
+        // ═══════════════════════════════════════════════════════════
+        function registrarMuestra() {
+            const nombrePaciente = document.getElementById('reg_nombrePaciente').value.trim();
+            const documento = document.getElementById('reg_documento').value.trim();
+            const edad = document.getElementById('reg_edad').value;
+            const sexo = document.getElementById('reg_sexo').value;
+            const evento = document.getElementById('reg_evento').value;
+            const sintomas = Array.from(document.getElementById('reg_sintomas').selectedOptions).map(opt => opt.value);
+            const tiposMuestra = Array.from(document.getElementById('reg_tipoMuestra').selectedOptions).map(opt => opt.value);
+            const fechaSintomas = document.getElementById('reg_fechaSintomas').value;
+            const referencia = document.getElementById('reg_referencia').value;
+            const resultadoLocal = document.getElementById('reg_resultadoLocal').value;
+
+            if (!nombrePaciente || !documento || !edad || !sexo || !evento || tiposMuestra.length === 0 || !resultadoLocal || sintomas.length === 0) {
+                alert('⚠️ Completa todos los campos obligatorios (*)\n- Selecciona al menos 1 síntoma\n- Selecciona al menos 1 tipo de muestra');
+                return;
+            }
+
+            const samples = getSamples();
+            const idMuestra = `MU-${new Date().getFullYear()}-${String(samples.length + 1).padStart(3, '0')}`;
+            
+            const nuevaMuestra = {
+                id: (samples.length + 1).toString(),
+                registroFecha: new Date().toISOString().split('T')[0],
+                nombrePaciente: nombrePaciente,
+                documento: documento,
+                edad: edad,
+                sexo: sexo,
+                idMuestra: idMuestra,
+                evento: evento,
+                tipoMuestra: tiposMuestra.join(', '), // Guardar como string separado por comas
+                sintomas: sintomas.join(', '), // Guardar como string separado por comas
+                fechaSintomas: fechaSintomas,
+                resultadoLocal: resultadoLocal,
+                requiereReferencia: referencia
+            };
+
+            samples.push(nuevaMuestra);
+            saveSamples(samples);
+
+            // Limpiar formulario
+            document.getElementById('reg_idMuestra').value = '';
+            document.getElementById('reg_nombrePaciente').value = '';
+            document.getElementById('reg_documento').value = '';
+            document.getElementById('reg_edad').value = '';
+            document.getElementById('reg_sexo').value = '';
+            document.getElementById('reg_sintomas').value = '';
+            document.getElementById('reg_fechaSintomas').value = '';
+            document.getElementById('reg_evento').value = '';
+            document.getElementById('reg_tipoMuestra').value = '';
+            document.getElementById('reg_referencia').value = 'si';
+            document.getElementById('reg_resultadoLocal').value = '';
+
+            alert(`✅ Muestra ${idMuestra} registrada correctamente con ${tiposMuestra.length} tipo(s) de muestra y ${sintomas.length} síntoma(s)`);
+            actualizarTablaRegistro();
+        }
+
+        function actualizarTablaRegistro() {
+            const samples = getSamples();
+            const tbody = document.getElementById('tabla_muestrasRegistradas');
+            
+            if (samples.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b;">Sin muestras registradas aún</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = samples.slice(-10).reverse().map(s => `
+                <tr>
+                    <td>${s.registroFecha}</td>
+                    <td>${s.nombrePaciente}</td>
+                    <td>${s.evento}</td>
+                    <td>${s.tipoMuestra}</td>
+                    <td>
+                        ${s.resultadoLocal === 'positivo' ? '<span class="badge badge-red">Positivo</span>' :
+                          s.resultadoLocal === 'negativo' ? '<span class="badge badge-green">Negativo</span>' :
+                          s.resultadoLocal === 'pendiente' ? '<span class="badge badge-blue">Pendiente</span>' :
+                          '<span class="badge badge-blue">Indeterminado</span>'}
+                    </td>
+                    <td>${s.requiereReferencia === 'si' ? '<span class="badge badge-blue">Sí</span>' : '<span class="badge badge-green">No</span>'}</td>
+                </tr>
+            `).join('');
+        }
+
+        // ════════════════════════════════════════════════════════════════════
+        // DATOS DE MUESTRAS DINÁMICAS POR EVENTO
+        // ════════════════════════════════════════════════════════════════════
+        const muestrasPorEvento = {
+            dengue: [
+                { tipo: 'Suero', volumen: '5 mL', tecnica: 'Punción venosa en tubo sin anticoagulante', almacenamiento: '2-8°C máximo 72 horas' },
+                { tipo: 'Sangre Total EDTA', volumen: '3 mL', tecnica: 'Punción venosa en tubo morado con EDTA', almacenamiento: '2-8°C máximo 24 horas' },
+                { tipo: 'LCR (si meningitis)', volumen: '2 mL', tecnica: 'Punción lumbar estéril', almacenamiento: '2-8°C URGENTE máximo 30min' }
+            ],
+            covid: [
+                { tipo: 'Hisopado Nasofaríngeo', volumen: '1 muestra', tecnica: 'Insertar hisopo hasta nasofaringe, girar 360°×15s', almacenamiento: '2-8°C máximo 48 horas' },
+                { tipo: 'Hisopado Orofaríngeo', volumen: '1 muestra', tecnica: 'Tocar amígdalas y garganta, girar 360°×15s', almacenamiento: '2-8°C máximo 48 horas' },
+                { tipo: 'Esputo (si neumonía)', volumen: '5-10 mL', tecnica: 'Paciente tose profundamente, esputo profundo', almacenamiento: '2-8°C máximo 24 horas' }
+            ],
+            tuberculosis: [
+                { tipo: 'Esputo (3 muestras)', volumen: '5-10 mL c/u', tecnica: 'Recolección matutina en días diferentes, esputo profundo', almacenamiento: 'Temperatura ambiente <2 horas' },
+                { tipo: 'Gota Gruesa', volumen: '1 lámina', tecnica: 'Extender gota de sangre en portaobjetos', almacenamiento: 'Temperatura ambiente' },
+                { tipo: 'Sangre Total', volumen: '5 mL', tecnica: 'Punción venosa en tubo morado', almacenamiento: '2-8°C máximo 24 horas' }
+            ],
+            sarampion: [
+                { tipo: 'Suero', volumen: '5 mL', tecnica: 'Punción venosa en tubo sin anticoagulante', almacenamiento: '2-8°C máximo 72 horas' },
+                { tipo: 'Orina', volumen: '30-50 mL', tecnica: 'Recolección en recipiente estéril limpio', almacenamiento: '2-8°C máximo 48 horas' },
+                { tipo: 'Hisopado Nasofaríngeo', volumen: '1 muestra', tecnica: 'Insertar hisopo hasta nasofaringe en primeros 3 días', almacenamiento: '2-8°C máximo 48 horas' }
+            ],
+            malaria: [
+                { tipo: 'Gota Gruesa (3 láminas)', volumen: '3 láminas', tecnica: 'En picos de fiebre diferentes, extender en portaobjetos', almacenamiento: 'Temperatura ambiente' },
+                { tipo: 'Frotis Fino', volumen: '1 lámina', tecnica: 'Extender fina para identificación de especie', almacenamiento: 'Temperatura ambiente' },
+                { tipo: 'Sangre Total EDTA', volumen: '3 mL', tecnica: 'Punción venosa en tubo morado', almacenamiento: '2-8°C máximo 24 horas' }
+            ],
+            influenza: [
+                { tipo: 'Hisopado Nasofaríngeo', volumen: '1 muestra', tecnica: 'Insertar hisopo hasta nasofaringe, girar 360°×15s', almacenamiento: '2-8°C máximo 48 horas' },
+                { tipo: 'Hisopado Orofaríngeo', volumen: '1 muestra', tecnica: 'Tocar amígdalas y garganta', almacenamiento: '2-8°C máximo 48 horas' },
+                { tipo: 'Esputo (si disponible)', volumen: '5-10 mL', tecnica: 'Esputo profundo de paciente', almacenamiento: '2-8°C máximo 24 horas' }
+            ]
+        };
+
+        function actualizarMuestrasEvento() {
+            const evento = document.getElementById('mue_filtro_evento').value;
+            const tbody = document.getElementById('tbody_muestras_evento');
+            
+            if (!evento) {
+                // Mostrar todas las muestras
+                let html = '';
+                for (let ev in muestrasPorEvento) {
+                    const muestras = muestrasPorEvento[ev];
+                    muestras.forEach(m => {
+                        html += `<tr style="border-bottom: 1px solid #e2e8f0;">
+                            <td style="padding: 12px;"><strong>${ev.charAt(0).toUpperCase() + ev.slice(1)}</strong></td>
+                            <td style="padding: 12px;"><strong>${m.tipo}</strong></td>
+                            <td style="padding: 12px;">${m.volumen}</td>
+                            <td style="padding: 12px;">${m.tecnica}</td>
+                            <td style="padding: 12px;">${m.almacenamiento}</td>
+                        </tr>`;
+                    });
+                }
+                tbody.innerHTML = html;
+            } else {
+                // Mostrar solo muestras del evento seleccionado
+                const muestras = muestrasPorEvento[evento];
+                if (!muestras) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 15px;">No hay datos</td></tr>';
+                    return;
+                }
+                
+                let html = '';
+                muestras.forEach(m => {
+                    html += `<tr style="border-bottom: 1px solid #e2e8f0; background: #f9fafb;">
+                        <td style="padding: 12px;"><strong>${evento.toUpperCase()}</strong></td>
+                        <td style="padding: 12px;"><strong>${m.tipo}</strong></td>
+                        <td style="padding: 12px;">${m.volumen}</td>
+                        <td style="padding: 12px;">${m.tecnica}</td>
+                        <td style="padding: 12px;">${m.almacenamiento}</td>
+                    </tr>`;
+                });
+                tbody.innerHTML = html;
+            }
+        }
+
+        // ════════════════════════════════════════════════════════════════════
+        // SÍNTOMAS POR EVENTO (para multiselect en Registrar)
+        // ════════════════════════════════════════════════════════════════════
+        const sintomasPorEvento = {
+            dengue: ['Fiebre (38°C+)', 'Cefalea intensa', 'Dolor retrorbitario', 'Mialgias', 'Artralgias', 'Rash cutáneo', 'Manifestaciones hemorrágicas'],
+            covid: ['Fiebre', 'Tos seca', 'Disnea', 'Pérdida de olfato', 'Pérdida de gusto', 'Cefalea', 'Diarrea', 'Astenia'],
+            tuberculosis: ['Tos ≥2 semanas', 'Expectoración', 'Hemoptisis', 'Fiebre vespertina', 'Sudoración nocturna', 'Pérdida de peso'],
+            sarampion: ['Fiebre ≥38°C', 'Tos', 'Coriza', 'Conjuntivitis', 'Rash maculopapular', 'Manchas de Koplik'],
+            malaria: ['Fiebre intermitente', 'Escalofríos', 'Sudoración profusa', 'Malestar general', 'Cefalea', 'Náuseas', 'Vómito'],
+            influenza: ['Fiebre', 'Tos', 'Mialgia', 'Cefalea', 'Congestión nasal', 'Dolor de garganta', 'Astenia']
+        };
+
+        function actualizarSintomasEventoReg() {
+            const evento = document.getElementById('reg_evento').value;
+            const selectSintomas = document.getElementById('reg_sintomas');
+            const selectTipos = document.getElementById('reg_tipoMuestra');
+            
+            selectSintomas.innerHTML = '';
+            selectTipos.innerHTML = '';
+            
+            if (!evento) {
+                selectSintomas.innerHTML = '<option value="">Selecciona un evento primero...</option>';
+                selectTipos.innerHTML = '<option value="">Selecciona un evento primero...</option>';
+                return;
+            }
+            
+            // Actualizar síntomas
+            if (sintomasPorEvento[evento]) {
+                sintomasPorEvento[evento].forEach(sintoma => {
+                    const opt = document.createElement('option');
+                    opt.value = sintoma;
+                    opt.textContent = sintoma;
+                    selectSintomas.appendChild(opt);
+                });
+            }
+            
+            // Actualizar tipos de muestra
+            if (muestrasPorEvento[evento]) {
+                muestrasPorEvento[evento].forEach(muestra => {
+                    const opt = document.createElement('option');
+                    opt.value = muestra.tipo;
+                    opt.textContent = muestra.tipo;
+                    selectTipos.appendChild(opt);
+                });
+            }
+        }
+
+        function actualizarTiposMuestraReg() {
+            // Función auxiliar para validar selección de muestras
+            const seleccionadas = Array.from(document.getElementById('reg_tipoMuestra').selectedOptions);
+            if (seleccionadas.length > 0) {
+                console.log('Muestras seleccionadas: ' + seleccionadas.map(o => o.value).join(', '));
+            }
+        }
+
+        function descargarExcelCompleto() {
+            const muestras = getSamples();
+            
+            if (muestras.length === 0) {
+                alert('No hay muestras para descargar');
+                return;
+            }
+
+            // Verificar si XLSX está disponible
+            if (typeof XLSX === 'undefined') {
+                console.warn('XLSX no disponible, usando CSV como fallback');
+                descargarCSVCompleto();
+                return;
+            }
+
+            try {
+                // Preparar datos para Excel
+                const datosExcel = [
+                    ['ID Muestra', 'Fecha Registro', 'Paciente', 'Documento', 'Edad', 'Sexo', 'Evento', 'Tipo Muestra', 'Síntomas', 'Fecha Síntomas', 'Resultado Local', 'Requiere Referencia', 'Resultado LSP']
+                ];
+                
+                muestras.forEach(m => {
+                    datosExcel.push([
+                        m.idMuestra,
+                        m.registroFecha,
+                        m.nombrePaciente,
+                        m.documento,
+                        m.edad,
+                        m.sexo,
+                        m.evento,
+                        m.tipoMuestra || '',
+                        m.sintomas || '',
+                        m.fechaSintomas,
+                        m.resultadoLocal,
+                        m.requiereReferencia,
+                        m.resultadoLSP || 'Pendiente'
+                    ]);
+                });
+
+                // Crear libro de trabajo
+                const ws = XLSX.utils.aoa_to_sheet(datosExcel);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Muestras');
+
+                // Estilos y formato
+                ws['!cols'] = [
+                    { wch: 15 }, // ID Muestra
+                    { wch: 15 }, // Fecha Registro
+                    { wch: 20 }, // Paciente
+                    { wch: 15 }, // Documento
+                    { wch: 8 },  // Edad
+                    { wch: 8 },  // Sexo
+                    { wch: 15 }, // Evento
+                    { wch: 25 }, // Tipo Muestra
+                    { wch: 30 }, // Síntomas
+                    { wch: 15 }, // Fecha Síntomas
+                    { wch: 15 }, // Resultado Local
+                    { wch: 18 }, // Requiere Referencia
+                    { wch: 15 }  // Resultado LSP
+                ];
+
+                // Descargar
+                const nombreArchivo = `EISP_Todas_Muestras_${new Date().toISOString().slice(0,10)}.xlsx`;
+                XLSX.writeFile(wb, nombreArchivo);
+                
+                alert(`✅ Descargado: ${nombreArchivo}\n📊 Total muestras: ${muestras.length}`);
+            } catch(error) {
+                console.error('Error al generar Excel:', error);
+                alert('⚠️ Error generando Excel. Intentando con CSV...');
+                descargarCSVCompleto();
+            }
+        }
+
+        function descargarCSVCompleto() {
+            const muestras = getSamples();
+            let csv = 'ID Muestra,Fecha Registro,Paciente,Documento,Edad,Sexo,Evento,Tipo Muestra,Síntomas,Fecha Síntomas,Resultado Local,Requiere Referencia,Resultado LSP\n';
+            
+            muestras.forEach(m => {
+                csv += `"${m.idMuestra}","${m.registroFecha}","${m.nombrePaciente}","${m.documento}","${m.edad}","${m.sexo}","${m.evento}","${m.tipoMuestra || ''}","${m.sintomas || ''}","${m.fechaSintomas}","${m.resultadoLocal}","${m.requiereReferencia}","${m.resultadoLSP || 'Pendiente'}"\n`;
+            });
+
+            const link = document.createElement('a');
+            link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+            link.download = 'EISP_Todas_Muestras_' + new Date().toISOString().slice(0,10) + '.csv';
+            link.click();
+            
+            alert(`✅ Descargado (CSV): EISP_Todas_Muestras_${new Date().toISOString().slice(0,10)}.csv\n📊 Total muestras: ${muestras.length}\n⚠️ Nota: Se descargó en formato CSV. Para Excel, intenta nuevamente.`);
+        }
+
+        function descargarExcelReferencia() {
+            const muestras = getSamples().filter(s => s.requiereReferencia === 'si');
+            
+            if (muestras.length === 0) {
+                alert('No hay muestras referidas para descargar');
+                return;
+            }
+
+            // Verificar si XLSX está disponible
+            if (typeof XLSX === 'undefined') {
+                console.warn('XLSX no disponible, usando CSV como fallback');
+                descargarCSVReferencia();
+                return;
+            }
+
+            try {
+                // Preparar datos para Excel
+                const datosExcel = [
+                    ['ID Muestra', 'Fecha Registro', 'Paciente', 'Evento', 'Resultado Local', 'Fecha Referencia', 'Estado Referencia', 'Laboratorio Destino', 'Resultado LSP', 'Fecha Contrarreferencia', 'Estado Final', 'Observaciones']
+                ];
+                
+                muestras.forEach(m => {
+                    datosExcel.push([
+                        m.idMuestra,
+                        m.registroFecha,
+                        m.nombrePaciente,
+                        m.evento,
+                        m.resultadoLocal,
+                        m.registroFecha,
+                        'Enviada',
+                        'LSP Bogotá',
+                        m.resultadoLSP || 'Pendiente',
+                        m.registroFecha,
+                        m.resultadoLSP ? 'Confirmado' : 'En Proceso',
+                        'Datos del sistema EISP'
+                    ]);
+                });
+
+                // Crear libro de trabajo
+                const ws = XLSX.utils.aoa_to_sheet(datosExcel);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Referencia');
+
+                // Estilos y formato
+                ws['!cols'] = [
+                    { wch: 15 }, // ID Muestra
+                    { wch: 15 }, // Fecha Registro
+                    { wch: 20 }, // Paciente
+                    { wch: 15 }, // Evento
+                    { wch: 15 }, // Resultado Local
+                    { wch: 15 }, // Fecha Referencia
+                    { wch: 18 }, // Estado Referencia
+                    { wch: 18 }, // Laboratorio Destino
+                    { wch: 15 }, // Resultado LSP
+                    { wch: 20 }, // Fecha Contrarreferencia
+                    { wch: 15 }, // Estado Final
+                    { wch: 25 }  // Observaciones
+                ];
+
+                // Descargar
+                const nombreArchivo = `EISP_Referencia_Contrarreferencia_${new Date().toISOString().slice(0,10)}.xlsx`;
+                XLSX.writeFile(wb, nombreArchivo);
+                
+                alert(`✅ Descargado: ${nombreArchivo}\n📊 Muestras referidas: ${muestras.length}`);
+            } catch(error) {
+                console.error('Error al generar Excel:', error);
+                alert('⚠️ Error generando Excel. Intentando con CSV...');
+                descargarCSVReferencia();
+            }
+        }
+
+        function descargarCSVReferencia() {
+            const muestras = getSamples().filter(s => s.requiereReferencia === 'si');
+            let csv = 'ID Muestra,Fecha Registro,Paciente,Evento,Resultado Local,Fecha Referencia,Estado Referencia,Laboratorio Destino,Resultado LSP,Fecha Contrarreferencia,Estado Final,Observaciones\n';
+            
+            muestras.forEach(m => {
+                csv += `"${m.idMuestra}","${m.registroFecha}","${m.nombrePaciente}","${m.evento}","${m.resultadoLocal}","${m.registroFecha}","Enviada","LSP Bogotá","${m.resultadoLSP || 'Pendiente'}","${m.registroFecha}","${m.resultadoLSP ? 'Confirmado' : 'En Proceso'}","Datos del sistema EISP"\n`;
+            });
+
+            const link = document.createElement('a');
+            link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+            link.download = 'EISP_Referencia_Contrarreferencia_' + new Date().toISOString().slice(0,10) + '.csv';
+            link.click();
+            
+            alert(`✅ Descargado (CSV): EISP_Referencia_Contrarreferencia_${new Date().toISOString().slice(0,10)}.csv\n📊 Muestras referidas: ${muestras.length}\n⚠️ Nota: Se descargó en formato CSV. Para Excel, intenta nuevamente.`);
+        }
+
+        function actualizarEstadisticasExcel() {
+            const muestras = getSamples();
+            const referidas = muestras.filter(s => s.requiereReferencia === 'si');
+            const conResultado = referidas.filter(s => s.resultadoLSP);
+            const pendientes = referidas.filter(s => !s.resultadoLSP);
+
+            document.getElementById('stat_total_ref').textContent = referidas.length;
+            document.getElementById('stat_completadas').textContent = conResultado.length;
+            document.getElementById('stat_pendientes_desc').textContent = pendientes.length;
+
+            // Actualizar tabla preview
+            const tbody = document.getElementById('tbody_preview_excel');
+            if (referidas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 15px; color: #64748b;">No hay muestras referidas</td></tr>';
+                return;
+            }
+
+            let html = '';
+            referidas.forEach(m => {
+                html += `<tr style="border-bottom: 1px solid #e2e8f0;">
+                    <td style="padding: 12px;"><strong>${m.idMuestra}</strong></td>
+                    <td style="padding: 12px;">${m.evento}</td>
+                    <td style="padding: 12px;">
+                        ${m.resultadoLocal === 'positivo' ? '<span style="background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">Positivo</span>' :
+                          m.resultadoLocal === 'negativo' ? '<span style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">Negativo</span>' :
+                          '<span style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">Pendiente</span>'}
+                    </td>
+                    <td style="padding: 12px;">
+                        ${m.resultadoLSP ? '<span style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">✅ ' + m.resultadoLSP + '</span>' : '<span style="background: #fef3c7; color: #b45309; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">⏳ Pendiente</span>'}
+                    </td>
+                    <td style="padding: 12px;">
+                        <span style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">En Proceso</span>
+                    </td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        window.onload = function() {
+            try {
+                const user = sessionStorage.getItem('currentUser');
+                if (user) {
+                    currentUser = user;
+                    document.getElementById('loginContainer').style.display = 'none';
+                    document.getElementById('appContainer').classList.add('active');
+                    cargarDatosFicticios();
+                    updateDashboard();
+                    actualizarMuestrasReferidas();
+                    actualizarTablaRegistro();
+                    // actualizarEstadisticasExcel(); // Comentado temporalmente
+                }
+            } catch(error) {
+                console.error('Error en window.onload:', error);
+            }
+        };
+    </script>
+</body>
+</html>
